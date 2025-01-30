@@ -1,13 +1,8 @@
+Untitled
+
 {
     "name": "Python Development",
-    "image": "mcr.microsoft.com/devcontainers/python:3.11-bullseye",
-    "features": {
-        "ghcr.io/devcontainers/features/python:1": {
-            "installJupyterlab": true
-        }
-    },
-    "waitFor": "updateContentCommand",
-    "updateContentCommand": "pip install --no-cache-dir -r requirements.txt",
+    "image": "mcr.microsoft.com/devcontainers/python:3.11",
     "customizations": {
         "vscode": {
             "extensions": [
@@ -23,8 +18,9 @@
                     "editor.defaultFormatter": "ms-python.black-formatter",
                     "editor.formatOnSave": true
                 },
-                "python.languageServer": "Pylance"
+                "python.defaultInterpreterPath": "/usr/local/bin/python"
             }
         }
-    }
+    },
+    "postCreateCommand": "pip install -r requirements.txt"
 }
