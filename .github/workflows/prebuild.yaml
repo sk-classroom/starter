@@ -1,0 +1,24 @@
+name: Prebuild Codespace
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.devcontainer/devcontainer.json'  # Only trigger on devcontainer.json changes
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  prebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create prebuild
+        uses: github/codespaces-precache@v1
+        with:
+          regions: "EastUs,EastUs2"  # East Coast regions for New York
+          prebuild_command: |
+            code-insiders --install-extension ms-python.python
+            code-insiders --install-extension ms-python.vscode-pylance
+            code-insiders --install-extension ms-python.black-formatter
+            code-insiders --install-extension ms-toolsai.jupyter
+            code-insiders --install-extension ms-toolsai.jupyter-renderers
+            pip install -r requirements.txt
