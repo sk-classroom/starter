@@ -1,6 +1,9 @@
 scikit-learn
 numpy
+scipy
 ipykernel
 black
 nbconvert
 jupytext
+black==23.12.1
+jupyter==1.0.0
