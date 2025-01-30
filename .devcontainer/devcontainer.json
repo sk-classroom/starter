@@ -6,13 +6,11 @@
         "vscode": {
             "extensions": [
                 "ms-python.python",
-                "ms-python.black-formatter",
+                "ms-python.black-formatter",  // Standalone Black formatter extension
                 "ms-toolsai.jupyter"
             ],
             "settings": {
-                "python.formatting.provider": "black",
-                "python.formatting.blackPath": "/usr/local/py-utils/bin/black",
-                "editor.formatOnSave": true,
+                // Black formatter settings
                 "[python]": {
                     "editor.defaultFormatter": "ms-python.black-formatter",
                     "editor.formatOnSave": true
@@ -24,4 +22,3 @@
         }
     }
 }
-
