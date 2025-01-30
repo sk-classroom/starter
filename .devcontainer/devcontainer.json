@@ -1,4 +1,4 @@
-
+{
     "name": "Python Development",
     "image": "mcr.microsoft.com/devcontainers/python:3.11",
     "customizations": {
