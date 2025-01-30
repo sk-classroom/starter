@@ -1,4 +1,4 @@
-{
+
     "name": "Python Development",
     "image": "mcr.microsoft.com/devcontainers/python:3.11",
     "customizations": {
@@ -20,5 +20,6 @@
             }
         }
     },
-    "postCreateCommand": "pip install -r requirements.txt"
+    "onCreateCommand": "echo 'Running prebuild setup...' && pip install -r requirements.txt",
+    "updateContentCommand": "echo 'Environment is ready!'"
 }
