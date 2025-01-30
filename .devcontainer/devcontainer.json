@@ -1,3 +1,4 @@
+# File: .devcontainer/devcontainer.json
 {
     "name": "Python Development",
     "image": "mcr.microsoft.com/devcontainers/python:3.11",
@@ -6,18 +7,26 @@
         "vscode": {
             "extensions": [
                 "ms-python.python",
-                "ms-python.black-formatter",  // Standalone Black formatter extension
-                "ms-toolsai.jupyter"
+                "ms-python.black-formatter",
+                "ms-toolsai.jupyter",
+                "ms-toolsai.jupyter-renderers",
+                "ms-toolsai.vscode-jupyter-cell-tags",
+                "ms-toolsai.jupyter-keymap"
             ],
             "settings": {
-                // Black formatter settings
+                // Set GitHub Light as default theme
+                "workbench.colorTheme": "GitHub Light Default",
+                
                 "[python]": {
                     "editor.defaultFormatter": "ms-python.black-formatter",
                     "editor.formatOnSave": true
                 },
                 "[jupyter]": {
                     "editor.formatOnSave": true
-                }
+                },
+                "notebook.formatOnSave.enabled": true,
+                "notebook.output.scrolling": true,
+                "notebook.formatOnCellExecution": true
             }
         }
     }
