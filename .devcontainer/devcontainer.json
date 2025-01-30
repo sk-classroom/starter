@@ -1,4 +1,3 @@
-# File: .devcontainer/devcontainer.json
 {
     "name": "Python Development",
     "image": "mcr.microsoft.com/devcontainers/python:3.11",
@@ -14,9 +13,7 @@
                 "ms-toolsai.jupyter-keymap"
             ],
             "settings": {
-                // Set GitHub Light as default theme
                 "workbench.colorTheme": "GitHub Light Default",
-                
                 "[python]": {
                     "editor.defaultFormatter": "ms-python.black-formatter",
                     "editor.formatOnSave": true
