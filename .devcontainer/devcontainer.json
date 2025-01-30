@@ -1,30 +1,20 @@
 {
-    "name": "Python Development",
-    "image": "mcr.microsoft.com/devcontainers/python:3.11",
-    "features": {
-        "ghcr.io/devcontainers/features/python:1": {
-            "installJupyterlab": true
-        }
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "hostRequirements": {
+    "cpus": 4
+  },
+  "waitFor": "onCreateCommand",
+  "updateContentCommand": "python3 -m pip install -r requirements.txt",
+  "postCreateCommand": "",
+  "customizations": {
+    "codespaces": {
+      "openFiles": []
     },
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "ms-python.python",
-                "ms-python.vscode-pylance",
-                "ms-python.black-formatter",
-                "ms-toolsai.jupyter",
-                "ms-toolsai.jupyter-renderers"
-            ],
-            "settings": {
-                "workbench.colorTheme": "GitHub Light Default",
-                "[python]": {
-                    "editor.defaultFormatter": "ms-python.black-formatter",
-                    "editor.formatOnSave": true
-                },
-                "python.defaultInterpreterPath": "/usr/local/bin/python"
-            }
-        }
-    },
-    "onCreateCommand": "echo 'Running prebuild setup...' && pip install -r requirements.txt",
-    "updateContentCommand": "echo 'Environment is ready!'"
+    "vscode": {
+      "extensions": [
+        "ms-toolsai.jupyter",
+        "ms-python.python"
+      ]
+    }
+  }
 }
