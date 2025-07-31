@@ -4,10 +4,11 @@ This script implements a quiz challenge system where students create questions t
 
 ## How it Works
 
-1. **Students create quiz questions** in TOML format
-2. **LLM attempts to answer** using `llama3.2:latest` model
-3. **Evaluator judges correctness** using `gemma3:27b` model  
-4. **Students win** if they can stump the LLM
+1. **Question Validation**: Questions and answers are validated for appropriateness
+2. **Students create quiz questions** in TOML format
+3. **LLM attempts to answer** using `llama3.2:latest` model (valid questions only)
+4. **Evaluator judges correctness** using `gemma3:27b` model  
+5. **Students win** if they can stump the LLM with valid questions
 
 ## Usage
 
@@ -64,6 +65,28 @@ For each module, the script automatically fetches and combines:
 
 If any of the expected files don't exist for a module, the script will skip them and use whatever content is available. If no files are found, it will fall back to running without module context.
 
+## Question Validation System
+
+The system automatically validates all questions and answers to ensure quality and appropriateness:
+
+### ✅ **What Gets Accepted**
+- Questions related to network science, graph theory, and course materials
+- Reasonable computational examples and conceptual questions
+- Well-formed questions with accurate answers
+- Applications of network science concepts to real scenarios
+
+### ❌ **What Gets Rejected**
+- **Heavy Math**: Complex mathematical derivations, advanced calculus, extensive calculations
+- **Off-Topic Content**: Questions not related to network science or graph theory
+- **Prompt Injection**: Attempts to manipulate the AI system ("ignore previous instructions", etc.)
+- **Poor Answer Quality**: Clearly wrong, nonsensical, or malformed answers
+
+### 🔧 **Validation Process**
+1. Each question-answer pair is evaluated by the AI validator
+2. Invalid questions are rejected and don't count toward your score
+3. Detailed feedback explains why questions were rejected
+4. Only valid questions are presented to the quiz-taking LLM
+
 ## Environment Variables
 
 - `CHAT_API`: API key for the LLM endpoint (GitHub secret)
@@ -98,7 +121,9 @@ answer = "Another answer..."
 The script provides comprehensive feedback including:
 
 ### Console Output
+- **Validation Summary**: Shows how many questions passed/failed validation
 - **Detailed Question Analysis**: Shows each question, your expected answer, the LLM's actual answer, and evaluator verdict
+- **Validation Issues**: Clear explanation of why questions were rejected (if any)
 - **Improvement Feedback**: Specific suggestions based on your success rate:
   - If LLM answered all questions correctly: Tips for creating more challenging questions
   - If partially successful: Analysis of what worked and what didn't
@@ -114,9 +139,11 @@ Detailed results saved in JSON format:
   "quiz_model": "llama3.2:latest", 
   "evaluator_model": "gemma3:27b",
   "total_questions": 3,
+  "valid_questions": 2,
+  "invalid_questions": 1,
   "student_wins": 1,
-  "llm_wins": 2,
-  "student_success_rate": 0.33,
+  "llm_wins": 1,
+  "student_success_rate": 0.5,
   "question_results": [
     {
       "question_number": 1,
@@ -124,9 +151,14 @@ Detailed results saved in JSON format:
       "correct_answer": "Your expected answer...",
       "llm_answer": "What the LLM actually answered...",
       "evaluation": {
-        "verdict": "CORRECT/INCORRECT",
+        "verdict": "CORRECT/INCORRECT/INVALID",
         "explanation": "Detailed evaluator reasoning...",
         "confidence": "HIGH/MEDIUM/LOW"
+      },
+      "validation": {
+        "valid": true,
+        "issues": [],
+        "reason": "Question passes all validation checks"
       },
       "student_wins": false,
       "winner": "LLM"
