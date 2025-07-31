@@ -46,7 +46,7 @@ class LLMQuizChallenge:
         self.module_context = self.load_module_content(module_name) if module_name else None
 
     def load_module_content(self, module_name: str) -> Optional[str]:
-        """Read LLM context from dedicated llm_context.qmd file."""
+        """Automatically fetch and concatenate module content files."""
         if not module_name:
             return None
 
@@ -56,30 +56,43 @@ class LLMQuizChallenge:
             github_repo = "adv-net-sci"
             github_branch = "main"
 
-            # Build URL for the llm_context.qmd file in the llm-context directory
+            # Files to concatenate for each module
+            content_files = ["01-concepts.qmd", "02-coding.qmd", "04-advanced.qmd"]
             base_raw_url = f"https://raw.githubusercontent.com/{github_user}/{github_repo}/{github_branch}/docs/lecture-note"
-            file_url = f"{base_raw_url}/llm-context/{module_name}.qmd"
-
-            logger.info(f"Fetching LLM context from: {file_url}")
-
-            # Fetch the llm_context.qmd file
-            req = urllib.request.Request(file_url)
-            req.add_header('User-Agent', 'llm-quiz-challenge')
-
-            with urllib.request.urlopen(req, timeout=10) as response:
-                content = response.read().decode('utf-8')
+            
+            combined_content = []
+            
+            for filename in content_files:
+                file_url = f"{base_raw_url}/{module_name}/{filename}"
+                logger.info(f"Fetching {filename} from: {file_url}")
                 
-            logger.info(f"Successfully loaded LLM context for {module_name}")
-            return content
+                try:
+                    req = urllib.request.Request(file_url)
+                    req.add_header('User-Agent', 'llm-quiz-challenge')
 
-        except urllib.error.HTTPError as e:
-            if e.code == 404:
-                logger.warning(f"llm_context.qmd not found for module {module_name}. Create one at: docs/lecture-note/{module_name}/llm_context.qmd")
+                    with urllib.request.urlopen(req, timeout=10) as response:
+                        content = response.read().decode('utf-8')
+                        combined_content.append(f"# {filename}\n\n{content}")
+                        logger.info(f"Successfully loaded {filename} for {module_name}")
+                        
+                except urllib.error.HTTPError as e:
+                    if e.code == 404:
+                        logger.warning(f"{filename} not found for module {module_name}, skipping")
+                    else:
+                        logger.error(f"HTTP error {e.code} fetching {filename} for {module_name}")
+                except Exception as e:
+                    logger.error(f"Error loading {filename} for {module_name}: {e}")
+            
+            if combined_content:
+                final_content = "\n\n" + "="*80 + "\n\n".join(combined_content)
+                logger.info(f"Successfully combined {len(combined_content)} files for {module_name}")
+                return final_content
             else:
-                logger.error(f"HTTP error {e.code} fetching LLM context for {module_name}")
-            return None
+                logger.warning(f"No content files found for module {module_name}")
+                return None
+
         except Exception as e:
-            logger.error(f"Error loading LLM context for {module_name}: {e}")
+            logger.error(f"Error loading module content for {module_name}: {e}")
             return None
 
     def load_quiz(self, quiz_file: Path) -> Dict[str, Any]:

@@ -37,14 +37,18 @@ python llm_quiz_grading.py \
 
 ### Module Context System
 
-The script looks for `llm_context.qmd` files in the dedicated llm-context directory to provide contextual information to the quiz-taking LLM. 
+The script automatically fetches and concatenates the latest module content files to provide contextual information to the quiz-taking LLM. This ensures the context is always up-to-date with the current lecture materials.
 
-**Expected file locations:**
-- `docs/lecture-note/llm-context/intro.qmd`
-- `docs/lecture-note/llm-context/m01-euler_tour.qmd` 
-- `docs/lecture-note/llm-context/m02-small-world.qmd`
-- `docs/lecture-note/llm-context/m03-robustness.qmd`
-- And so on...
+**Automated Content Loading:**
+For each module, the script automatically fetches and combines:
+- `01-concepts.qmd` - Core concepts and theory
+- `02-coding.qmd` - Coding exercises and examples  
+- `04-advanced.qmd` - Advanced topics and applications
+
+**Source File Locations:**
+- `docs/lecture-note/{module_name}/01-concepts.qmd`
+- `docs/lecture-note/{module_name}/02-coding.qmd`
+- `docs/lecture-note/{module_name}/04-advanced.qmd`
 
 **Available Module Options:**
 - `intro` - Introduction to Network Science
@@ -58,7 +62,7 @@ The script looks for `llm_context.qmd` files in the dedicated llm-context direct
 - `m08-embedding` - Network Embeddings
 - `m09-graph-neural-networks` - Graph Neural Networks
 
-If an `llm_context.qmd` file doesn't exist for a module, the script will fall back to running without module context.
+If any of the expected files don't exist for a module, the script will skip them and use whatever content is available. If no files are found, it will fall back to running without module context.
 
 ## Environment Variables
 
