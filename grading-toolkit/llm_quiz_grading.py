@@ -392,9 +392,9 @@ def main():
         challenge.save_results(results, args.output)
 
         # Print summary
-        print(f"\n{'='*60}")
+        print(f"\n{'='*80}")
         print(f"LLM QUIZ CHALLENGE RESULTS")
-        print(f"{'='*60}")
+        print(f"{'='*80}")
         print(f"Quiz: {results['quiz_title']}")
         print(f"Quiz Model: {results['quiz_model']}")
         print(f"Evaluator Model: {results['evaluator_model']}")
@@ -402,23 +402,85 @@ def main():
         print(f"Student Wins: {results['student_wins']}")
         print(f"LLM Wins: {results['llm_wins']}")
         print(f"Student Success Rate: {results['student_success_rate']:.1%}")
-        print(f"\nDetailed Results:")
+        
+        print(f"\n{'='*80}")
+        print(f"DETAILED QUESTION ANALYSIS")
+        print(f"{'='*80}")
 
         for result in results['question_results']:
             winner_emoji = "🎉" if result['student_wins'] else "🤖"
-            print(f"  Q{result['question_number']}: {winner_emoji} {result['winner']} wins")
-            if result['student_wins']:
-                print(f"    Evaluation: {result['evaluation']['explanation']}")
+            print(f"\n📝 Question {result['question_number']}: {winner_emoji} {result['winner']} wins")
+            print(f"{'─'*60}")
+            print(f"Question: {result['question']}")
+            print(f"\n💡 Your Expected Answer:")
+            print(f"{result['correct_answer']}")
+            print(f"\n🤖 LLM's Answer:")
+            print(f"{result['llm_answer']}")
+            print(f"\n⚖️  Evaluator's Verdict: {result['evaluation']['verdict']}")
+            print(f"📊 Confidence: {result['evaluation']['confidence']}")
+            print(f"📝 Evaluation: {result['evaluation']['explanation']}")
 
-        print(f"\nResults saved to: {args.output}")
-
-        # Overall verdict
-        if results['student_success_rate'] > 0.5:
-            print(f"\n🎉 Congratulations! You stumped the LLM on {results['student_wins']}/{results['total_questions']} questions!")
-        elif results['student_success_rate'] > 0:
-            print(f"\n👍 Good effort! You managed to stump the LLM on {results['student_wins']} questions.")
+        print(f"\n{'='*80}")
+        print(f"FEEDBACK FOR QUIZ IMPROVEMENT")
+        print(f"{'='*80}")
+        
+        # Provide specific feedback based on results
+        if results['student_success_rate'] == 0:
+            print(f"🤖 The LLM answered all questions correctly. Here's how to create more challenging questions:")
+            print(f"")
+            print(f"💡 Tips for Stumping the LLM:")
+            print(f"   • Ask for specific numerical calculations or precise formulas")
+            print(f"   • Include questions that require multi-step reasoning")
+            print(f"   • Focus on edge cases or counterintuitive scenarios")
+            print(f"   • Ask about very recent research or specific implementation details")
+            print(f"   • Create questions that require distinguishing between similar concepts")
+            print(f"")
+            print(f"📋 Analysis of Your Questions:")
+            for i, result in enumerate(results['question_results'], 1):
+                print(f"   Q{i}: The LLM correctly understood and answered this question.")
+                print(f"        Consider making it more specific or adding complexity.")
+                
+        elif results['student_success_rate'] < 0.5:
+            print(f"👍 Good effort! You managed to stump the LLM on {results['student_wins']} questions.")
+            print(f"")
+            print(f"🎯 What Worked:")
+            for result in results['question_results']:
+                if result['student_wins']:
+                    print(f"   • Q{result['question_number']}: Successfully challenged the LLM")
+                    print(f"     Reason: {result['evaluation']['explanation'][:100]}...")
+            print(f"")
+            print(f"🔧 Areas for Improvement:")
+            for result in results['question_results']:
+                if not result['student_wins']:
+                    print(f"   • Q{result['question_number']}: Try making this more challenging")
+                    print(f"     The LLM handled this well, consider adding complexity")
+                    
         else:
-            print(f"\n🤖 The LLM answered all questions correctly. Try creating more challenging questions!")
+            print(f"🎉 Excellent! You stumped the LLM on {results['student_wins']}/{results['total_questions']} questions!")
+            print(f"")
+            print(f"🌟 Your Successful Strategies:")
+            for result in results['question_results']:
+                if result['student_wins']:
+                    print(f"   • Q{result['question_number']}: Great challenging question!")
+                    print(f"     Why it worked: {result['evaluation']['explanation'][:100]}...")
+
+        print(f"\n{'='*80}")
+        print(f"GENERAL QUIZ CREATION TIPS")
+        print(f"{'='*80}")
+        print(f"🎯 Effective Question Types:")
+        print(f"   • Computational problems requiring precise calculations")
+        print(f"   • Scenario-based questions with multiple constraints")
+        print(f"   • Questions about subtle differences between concepts")
+        print(f"   • Problems requiring step-by-step mathematical derivations")
+        print(f"   • Applications to novel or edge-case scenarios")
+        print(f"")
+        print(f"⚠️  Question Types LLMs Handle Well:")
+        print(f"   • General conceptual explanations")
+        print(f"   • Standard textbook-style questions")
+        print(f"   • Questions with obvious keywords from course materials")
+        print(f"   • Broad 'explain the concept' type questions")
+
+        print(f"\nDetailed results saved to: {args.output}")
 
     except Exception as e:
         logger.error(f"Challenge failed: {e}")

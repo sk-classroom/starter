@@ -95,18 +95,43 @@ answer = "Another answer..."
 
 ## Output
 
-The script generates a JSON file with detailed results:
+The script provides comprehensive feedback including:
+
+### Console Output
+- **Detailed Question Analysis**: Shows each question, your expected answer, the LLM's actual answer, and evaluator verdict
+- **Improvement Feedback**: Specific suggestions based on your success rate:
+  - If LLM answered all questions correctly: Tips for creating more challenging questions
+  - If partially successful: Analysis of what worked and what didn't
+  - If highly successful: Recognition of effective strategies
+- **General Tips**: Guidance on question types that work well vs. those LLMs handle easily
+
+### JSON Results File
+Detailed results saved in JSON format:
 
 ```json
 {
   "quiz_title": "Network Science Quiz",
-  "quiz_model": "llama3.2:latest",
+  "quiz_model": "llama3.2:latest", 
   "evaluator_model": "gemma3:27b",
   "total_questions": 3,
   "student_wins": 1,
   "llm_wins": 2,
   "student_success_rate": 0.33,
-  "question_results": [...]
+  "question_results": [
+    {
+      "question_number": 1,
+      "question": "Your question text...",
+      "correct_answer": "Your expected answer...",
+      "llm_answer": "What the LLM actually answered...",
+      "evaluation": {
+        "verdict": "CORRECT/INCORRECT",
+        "explanation": "Detailed evaluator reasoning...",
+        "confidence": "HIGH/MEDIUM/LOW"
+      },
+      "student_wins": false,
+      "winner": "LLM"
+    }
+  ]
 }
 ```
 
