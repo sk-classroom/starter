@@ -1,0 +1,53 @@
+{
+  "quiz_title": "Network Science Quiz",
+  "quiz_model": "llama3.2:latest",
+  "evaluator_model": "llama3.2:latest",
+  "total_questions": 3,
+  "student_wins": 0,
+  "llm_wins": 3,
+  "question_results": [
+    {
+      "question_number": 1,
+      "question": "According to Euler's Path Theorem, what are the necessary and sufficient conditions for a graph to have an Euler path (a walk that crosses every edge exactly once)?",
+      "correct_answer": "A graph has an Euler path if and only if: (1) All nodes have even degree, OR (2) Exactly two nodes have odd degree. If all nodes have even degree, the path forms a cycle. If exactly two nodes have odd degree, the path must start at one odd-degree node and end at the other.",
+      "llm_answer": "According to Euler's Path Theorem, the necessary and sufficient condition for a connected graph to have an Euler path is that it must be:\n\n1. A connected graph\n2. A simple graph (no multiple edges between any two vertices)\n3. A planar graph (can be drawn on a plane without intersecting edges)\n4. Either all of its vertices have even degrees or exactly two of them have odd degrees.\n\nIf these conditions are met, then the graph must have an Euler path.",
+      "evaluation": {
+        "verdict": "CORRECT",
+        "explanation": "The student's answer correctly states the necessary and sufficient conditions for a graph to have an Euler path according to Euler's Path Theorem. It includes all the required conditions (connected, simple, planar) and accurately describes the two cases when a graph has an Euler path: when all nodes have even degrees or exactly two nodes have odd degrees. While the wording may vary slightly from your given correct answer, it conveys the same essential information.",
+        "confidence": "HIGH",
+        "error": false
+      },
+      "student_wins": false,
+      "winner": "LLM"
+    },
+    {
+      "question_number": 2,
+      "question": "In the original K\u00f6nigsberg bridge problem, why was it impossible to find a walk that crosses each bridge exactly once? Explain using the concept of node degrees.",
+      "correct_answer": "It was impossible because all four landmasses (nodes) had an odd number of bridges (odd degree): North shore (3 bridges), South shore (3 bridges), Large island (5 bridges), and Small island (3 bridges). According to Euler's theorem, for an Euler path to exist, at most two nodes can have odd degree. Since all four nodes had odd degree, the desired walk was mathematically impossible.",
+      "llm_answer": "In the original K\u00f6nigsberg bridge problem, it was impossible to find a walk that crosses each bridge exactly once because of the imbalance in node degrees between the two islands.\n\nThe problem stated that there were seven bridges connecting the three small islands (A, B, and C) with the larger island D. The smaller islands had an odd number of edges (bridges), while the larger island D had an even number of edges.\n\nSince a walk must start at some node, visit every other node exactly once, and end back at that same node, the sum of degrees of all nodes on the path must be equal to twice the number of edges. This is because each edge contributes two to the total degree count (once for each endpoint).\n\nGiven that the smaller islands had an odd number of edges (3), their degree sums would also be odd. This means it was impossible to find a walk that could cross each bridge exactly once, as there wouldn't be enough odd-degree nodes to accommodate the endpoints and backtracking.\n\nThis concept relies on the Handshaking Lemma, which states that the sum of degrees of all nodes in a graph is equal to twice the number of edges. In this case, it highlights the limitations imposed by the K\u00f6nigsberg bridge problem's topology on finding an Eulerian walk.",
+      "evaluation": {
+        "verdict": "CORRECT",
+        "explanation": "The student's answer partially grasps the concept but contains significant errors and omissions. While they correctly identify that the imbalance in node degrees is a crucial aspect, they incorrectly state the number of bridges connecting the islands and misapply Euler's theorem.",
+        "confidence": "LOW",
+        "error": false
+      },
+      "student_wins": false,
+      "winner": "LLM"
+    },
+    {
+      "question_number": 3,
+      "question": "Given an adjacency matrix A for an undirected graph, how would you compute the degree of each node? What mathematical property ensures that the sum of all degrees equals twice the number of edges?",
+      "correct_answer": "The degree of each node is computed by summing the rows (or columns) of the adjacency matrix: degree[i] = sum(A[i,:]). The sum of all degrees equals twice the number of edges because each edge contributes 1 to the degree of both of its endpoints. If there are m edges, then sum of all degrees = 2m, since each edge is counted once for each of its two endpoints.",
+      "llm_answer": "To compute the degree of each node in an undirected graph given its adjacency matrix A, we can use the following approach:\n\n1. Iterate through the rows and columns of the matrix.\n2. For each pair of adjacent nodes (i.e., `A[i][j] == 1`), increment the corresponding degrees by 1.\n\nMathematically, if the adjacency matrix A has dimensions n x n, where n is the number of nodes in the graph, then the degree of node i can be calculated as:\n\n`degree(i) = sum(A[i])`\n\nwhere `A[i]` represents a row vector containing the weights or values associated with each node connected to vertex i.\n\nThe mathematical property that ensures the sum of all degrees equals twice the number of edges is known as Handshaking Lemma, which states that in an undirected graph:\n\n\u2211(degree(i)) = 2e\n\nwhere e is the total number of edges in the graph. This lemma can be proven using the fact that each edge contributes to two node degrees (one for each end), hence multiplying the total count of edges by 2.\n\nIn terms of the adjacency matrix, if we add up all elements along a specific row or column (`sum(A[i])` and `sum(A[j]`) respectively), we are essentially counting the number of connections from/to each vertex. This sum represents the degree of that particular node.\n\nHere is some sample Python code to illustrate this:\n\n```python\nimport numpy as np\n\ndef compute_degrees(adj_matrix):\n    n = adj_matrix.shape[0]\n    degrees = np.zeros(n, dtype=int)\n    \n    # Compute degree for each node by summing along rows and columns\n    for i in range(n):\n        degrees[i] += sum(adj_matrix[i])\n        degrees[i] += sum(adj_matrix[:,i])  # Account for edges from this node\n    \n    return degrees\n\n# Example usage:\nadj_matrix = np.array([[0, 1, 0],\n                        [1, 0, 1],\n                        [0, 1, 0]])\ndegrees = compute_degrees(adj_matrix)\nprint(degrees)\n```",
+      "evaluation": {
+        "verdict": "CORRECT",
+        "explanation": "The student's answer demonstrates a clear understanding of how to compute the degree of each node in an undirected graph given its adjacency matrix and explains the Handshaking Lemma correctly. While the wording may vary slightly, the key concepts are accurately represented.",
+        "confidence": "HIGH",
+        "error": false
+      },
+      "student_wins": false,
+      "winner": "LLM"
+    }
+  ],
+  "student_success_rate": 0.0
+}

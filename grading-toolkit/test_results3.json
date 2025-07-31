@@ -1,0 +1,53 @@
+{
+  "quiz_title": "Network Science Quiz",
+  "quiz_model": "llama3.2:latest",
+  "evaluator_model": "gemma3:27b",
+  "total_questions": 3,
+  "student_wins": 0,
+  "llm_wins": 3,
+  "question_results": [
+    {
+      "question_number": 1,
+      "question": "According to Euler's Path Theorem, what are the necessary and sufficient conditions for a graph to have an Euler path (a walk that crosses every edge exactly once)?",
+      "correct_answer": "A graph has an Euler path if and only if: (1) All nodes have even degree, OR (2) Exactly two nodes have odd degree. If all nodes have even degree, the path forms a cycle. If exactly two nodes have odd degree, the path must start at one odd-degree node and end at the other.",
+      "llm_answer": "No response from LLM",
+      "evaluation": {
+        "verdict": "ERROR",
+        "explanation": "Unable to evaluate due to API issues",
+        "confidence": "LOW",
+        "error": true
+      },
+      "student_wins": false,
+      "winner": "LLM"
+    },
+    {
+      "question_number": 2,
+      "question": "In the original K\u00f6nigsberg bridge problem, why was it impossible to find a walk that crosses each bridge exactly once? Explain using the concept of node degrees.",
+      "correct_answer": "It was impossible because all four landmasses (nodes) had an odd number of bridges (odd degree): North shore (3 bridges), South shore (3 bridges), Large island (5 bridges), and Small island (3 bridges). According to Euler's theorem, for an Euler path to exist, at most two nodes can have odd degree. Since all four nodes had odd degree, the desired walk was mathematically impossible.",
+      "llm_answer": "No response from LLM",
+      "evaluation": {
+        "verdict": "ERROR",
+        "explanation": "Unable to evaluate due to API issues",
+        "confidence": "LOW",
+        "error": true
+      },
+      "student_wins": false,
+      "winner": "LLM"
+    },
+    {
+      "question_number": 3,
+      "question": "Given an adjacency matrix A for an undirected graph, how would you compute the degree of each node? What mathematical property ensures that the sum of all degrees equals twice the number of edges?",
+      "correct_answer": "The degree of each node is computed by summing the rows (or columns) of the adjacency matrix: degree[i] = sum(A[i,:]). The sum of all degrees equals twice the number of edges because each edge contributes 1 to the degree of both of its endpoints. If there are m edges, then sum of all degrees = 2m, since each edge is counted once for each of its two endpoints.",
+      "llm_answer": "No response from LLM",
+      "evaluation": {
+        "verdict": "ERROR",
+        "explanation": "Unable to evaluate due to API issues",
+        "confidence": "LOW",
+        "error": true
+      },
+      "student_wins": false,
+      "winner": "LLM"
+    }
+  ],
+  "student_success_rate": 0.0
+}

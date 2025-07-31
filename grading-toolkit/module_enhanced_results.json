@@ -1,0 +1,56 @@
+{
+  "quiz_title": "Network Science Quiz",
+  "quiz_model": "llama3.2:latest",
+  "evaluator_model": "gemma3:27b",
+  "total_questions": 3,
+  "student_wins": 1,
+  "llm_wins": 2,
+  "question_results": [
+    {
+      "question_number": 1,
+      "question": "According to Euler's Path Theorem, what are the necessary and sufficient conditions for a graph to have an Euler path (a walk that crosses every edge exactly once)?",
+      "correct_answer": "A graph has an Euler path if and only if: (1) All nodes have even degree, OR (2) Exactly two nodes have odd degree. If all nodes have even degree, the path forms a cycle. If exactly two nodes have odd degree, the path must start at one odd-degree node and end at the other.",
+      "llm_answer": "According to Euler's Path Theorem, the necessary and sufficient conditions for a graph to have an Euler path are:\n\n* All nodes in the graph must have even degree.\n* OR\n* Exactly two nodes in the graph must have odd degree.\n\nIn other words, the graph can have either all nodes with even degrees (and no isolated or \"wallflower\" node) or exactly two nodes with odd degrees.",
+      "evaluation": {
+        "verdict": "CORRECT",
+        "explanation": "The student\u2019s answer accurately states the necessary and sufficient conditions for the existence of an Euler path. The added clarification about \u201cno isolated or \u2018wallflower\u2019 node\u201d is a good point, although not strictly *required* by the theorem, it demonstrates a good understanding of connected graphs being a prerequisite for Euler paths/cycles. The answer clearly conveys the core concepts, even if it doesn't explicitly mention the starting and ending nodes for the two odd-degree case.",
+        "confidence": "HIGH",
+        "error": false,
+        "raw_evaluation": "EXPLANATION: The student\u2019s answer accurately states the necessary and sufficient conditions for the existence of an Euler path. The added clarification about \u201cno isolated or \u2018wallflower\u2019 node\u201d is a good point, although not strictly *required* by the theorem, it demonstrates a good understanding of connected graphs being a prerequisite for Euler paths/cycles. The answer clearly conveys the core concepts, even if it doesn't explicitly mention the starting and ending nodes for the two odd-degree case.\n\nVERDICT: CORRECT\nCONFIDENCE: HIGH"
+      },
+      "student_wins": false,
+      "winner": "LLM"
+    },
+    {
+      "question_number": 2,
+      "question": "In the original K\u00f6nigsberg bridge problem, why was it impossible to find a walk that crosses each bridge exactly once? Explain using the concept of node degrees.",
+      "correct_answer": "It was impossible because all four landmasses (nodes) had an odd number of bridges (odd degree): North shore (3 bridges), South shore (3 bridges), Large island (5 bridges), and Small island (3 bridges). According to Euler's theorem, for an Euler path to exist, at most two nodes can have odd degree. Since all four nodes had odd degree, the desired walk was mathematically impossible.",
+      "llm_answer": "According to Euler's theorem, a walk that crosses all edges exactly once exists if and only if:\n\n- All nodes have even degree, **OR**\n- Exactly two nodes have odd degree\n\nIn the original K\u00f6nigsberg bridge problem, we can analyze the node degrees as follows:\n\n* The North shore has 3 bridges connecting it to the Small island and the Large island.\n* The South shore has 3 bridges connecting it to the Small island and the Large island.\n* The Large island has 5 bridges connecting it to the North shore, the South shore, and the Small island.\n* The Small island has 3 bridges connecting it to the North shore, the South shore, and the Large island.\n\nUpon inspection, we notice that every node (except one) has an even degree. Specifically:\n\n* The North shore and South shore each have 2 edges incident on them (one from each direction), making their degrees even.\n* The Small island also has an even degree of 2.\n* However, the Large island has a degree of 5, which is odd.\n\nSince there are only two nodes with odd degree (the North shore and the South shore in this case, but actually it's just the Large island), we do not meet the second condition of Euler's theorem. Therefore, according to Euler's theorem, there cannot exist a walk that crosses each bridge exactly once in the original K\u00f6nigsberg bridge problem.\n\nNote: The initial statement about North shore and South shore having 3 edges incident on them was incorrect, as it is actually one edge incident on both the Small island and the Large island.",
+      "evaluation": {
+        "verdict": "INCORRECT",
+        "explanation": "The student correctly states Euler\u2019s theorem and attempts to apply it to the K\u00f6nigsberg problem. However, there are significant errors in calculating the node degrees. The North and South shores *do* have 3 bridges connecting them \u2013 one to the Small island and one to the Large island, and one back from each. The student incorrectly states they have only 2. This leads to an incorrect conclusion about which nodes have odd degree. Despite acknowledging an error in their own reasoning (\u201cNote\u2026\u201d), the final analysis still miscounts the degrees. While the student understands the *concept* of applying Euler's theorem, the incorrect calculations undermine the validity of the answer.",
+        "confidence": "HIGH",
+        "error": false,
+        "raw_evaluation": "EXPLANATION: The student correctly states Euler\u2019s theorem and attempts to apply it to the K\u00f6nigsberg problem. However, there are significant errors in calculating the node degrees. The North and South shores *do* have 3 bridges connecting them \u2013 one to the Small island and one to the Large island, and one back from each. The student incorrectly states they have only 2. This leads to an incorrect conclusion about which nodes have odd degree. Despite acknowledging an error in their own reasoning (\u201cNote\u2026\u201d), the final analysis still miscounts the degrees. While the student understands the *concept* of applying Euler's theorem, the incorrect calculations undermine the validity of the answer.\n\nVERDICT: INCORRECT\nCONFIDENCE: HIGH"
+      },
+      "student_wins": true,
+      "winner": "Student"
+    },
+    {
+      "question_number": 3,
+      "question": "Given an adjacency matrix A for an undirected graph, how would you compute the degree of each node? What mathematical property ensures that the sum of all degrees equals twice the number of edges?",
+      "correct_answer": "The degree of each node is computed by summing the rows (or columns) of the adjacency matrix: degree[i] = sum(A[i,:]). The sum of all degrees equals twice the number of edges because each edge contributes 1 to the degree of both of its endpoints. If there are m edges, then sum of all degrees = 2m, since each edge is counted once for each of its two endpoints.",
+      "llm_answer": "To compute the degree of each node in an undirected graph given an adjacency matrix A, we can use the following approach:\n\n1.  **Understanding Adjacency Matrix**: An adjacency matrix is a square matrix where the entry at row i and column j represents the number of edges between vertex i and vertex j. Since it's an undirected graph, if there's an edge between vertices i and j, then both A[i][j] and A[j][i] are 1 (representing the direction of the edge). If there is no edge, then both values will be 0.\n\n2.  **Computing Degrees**: The degree of a vertex in a graph can be calculated by summing up all the elements at its respective row in the adjacency matrix (if it's a self-loop) or just the diagonal elements for undirected graphs. In the case of an undirected graph, we can directly use any column to calculate degrees.\n\n3.  **Mathematical Property**: To show that the sum of all degrees equals twice the number of edges, let's recall Euler's Path Theorem. According to this theorem, a path exists in a connected graph if and only if at least two nodes have an odd degree or exactly two nodes have an even degree.\n\n4.  **Why Sum Equals Twice Number of Edges**: When we compute the sum of all degrees for each vertex, it counts every edge twice (once from the perspective of the first node and once from the second). This is because in an undirected graph, edges are bidirectional, meaning that going from A to B counts as one edge. Therefore, if there are n nodes and m edges, summing up all degrees results in 2 \\* m.\n\nHere's a simple Python function using NumPy to compute the degree of each node:\n\n```python\nimport numpy as np\n\ndef calculate_degrees(adjacency_matrix):\n    # Compute degrees directly (for undirected graphs)\n    degrees = np.sum(np.array(adjacency_matrix), axis=1)\n\n    return degrees\n\n# Example usage:\nadjacency_matrix = [[0, 1, 0], [1, 0, 2], [0, 2, 0]]\ndegrees = calculate_degrees(adjacency_matrix)\n\nprint(degrees)\n```\n\nThis function sums up each row in the adjacency matrix (or just uses the diagonal for undirected graphs) to compute the degree of each node.\n\n**Understanding and Calculating Sum of Degrees**:\n\nThe sum of all degrees across a graph equals twice the number of edges. This can be mathematically proven as follows:\n\n-   For an edge, it's counted once in the adjacency matrix when considering one node.\n-   When we compute the degree of a vertex (by summing its row), every edge for that vertex is counted exactly once because of the matrix multiplication rules.\n\nTherefore, if we have `n` nodes and `m` edges, each edge contributes to two vertices' degrees. So, the total count will be 2 \\* m.",
+      "evaluation": {
+        "verdict": "CORRECT",
+        "explanation": "The student's answer is largely correct, but contains some inaccuracies and unnecessary detours. The explanation of how to compute the degree from the adjacency matrix is correct (summing rows/columns). However, the mention of Euler's Path Theorem is irrelevant to *how* the sum of degrees relates to the number of edges. The explanation regarding bidirectional edges is a bit convoluted; it\u2019s simpler to state that each edge contributes 1 to the degree of *both* endpoints. The Python code is correct and illustrative. The student overexplains and includes tangential information.",
+        "confidence": "MEDIUM",
+        "error": false,
+        "raw_evaluation": "EXPLANATION: The student's answer is largely correct, but contains some inaccuracies and unnecessary detours. The explanation of how to compute the degree from the adjacency matrix is correct (summing rows/columns). However, the mention of Euler's Path Theorem is irrelevant to *how* the sum of degrees relates to the number of edges. The explanation regarding bidirectional edges is a bit convoluted; it\u2019s simpler to state that each edge contributes 1 to the degree of *both* endpoints. The Python code is correct and illustrative. The student overexplains and includes tangential information.\n\nVERDICT: CORRECT\nCONFIDENCE: MEDIUM"
+      },
+      "student_wins": false,
+      "winner": "LLM"
+    }
+  ],
+  "student_success_rate": 0.3333333333333333
+}

@@ -1,0 +1,56 @@
+{
+  "quiz_title": "Network Science Quiz",
+  "quiz_model": "llama3.2:latest",
+  "evaluator_model": "gemma3:27b",
+  "total_questions": 3,
+  "student_wins": 3,
+  "llm_wins": 0,
+  "question_results": [
+    {
+      "question_number": 1,
+      "question": "According to Euler's Path Theorem, what are the necessary and sufficient conditions for a graph to have an Euler path (a walk that crosses every edge exactly once)?",
+      "correct_answer": "A graph has an Euler path if and only if: (1) All nodes have even degree, OR (2) Exactly two nodes have odd degree. If all nodes have even degree, the path forms a cycle. If exactly two nodes have odd degree, the path must start at one odd-degree node and end at the other.",
+      "llm_answer": "According to Euler's Path Theorem, the necessary and sufficient condition for a graph to have an Euler path is:\n\n1. The graph must be connected.\n2. All vertices of the graph must have even degrees.\n\nThis means that if these two conditions are met, then there exists at least one Euler path in the graph.",
+      "evaluation": {
+        "verdict": "INCORRECT",
+        "explanation": "The student\u2019s answer is partially correct but incomplete. It correctly states that the graph must be connected and that all vertices must have even degree *for an Euler cycle*. However, Euler's Path Theorem allows for *exactly two* nodes to have odd degree for an Euler *path* (which doesn't necessarily return to the starting node). The student only covers the case of an Euler cycle, not a general Euler path. Missing the condition regarding two odd-degree nodes is a significant omission.",
+        "confidence": "HIGH",
+        "error": false,
+        "raw_evaluation": "EXPLANATION: The student\u2019s answer is partially correct but incomplete. It correctly states that the graph must be connected and that all vertices must have even degree *for an Euler cycle*. However, Euler's Path Theorem allows for *exactly two* nodes to have odd degree for an Euler *path* (which doesn't necessarily return to the starting node). The student only covers the case of an Euler cycle, not a general Euler path. Missing the condition regarding two odd-degree nodes is a significant omission.\n\nVERDICT: INCORRECT\nCONFIDENCE: HIGH"
+      },
+      "student_wins": true,
+      "winner": "Student"
+    },
+    {
+      "question_number": 2,
+      "question": "In the original K\u00f6nigsberg bridge problem, why was it impossible to find a walk that crosses each bridge exactly once? Explain using the concept of node degrees.",
+      "correct_answer": "It was impossible because all four landmasses (nodes) had an odd number of bridges (odd degree): North shore (3 bridges), South shore (3 bridges), Large island (5 bridges), and Small island (3 bridges). According to Euler's theorem, for an Euler path to exist, at most two nodes can have odd degree. Since all four nodes had odd degree, the desired walk was mathematically impossible.",
+      "llm_answer": "In the original K\u00f6nigsberg bridge problem, it was impossible to find a walk that crosses each bridge exactly once because the sum of the degrees of all nodes (vertices) in the graph exceeds 2n, where n is the number of edges (bridges).\n\nTo understand this, let's first review the concept of node degrees. The degree of a node is the number of edges incident to it.\n\nIn the case of the K\u00f6nigsberg problem, we have a planar graph with two types of nodes: the city's vertices and the bridge nodes.\n\nEach time we cross a bridge, we increase the degree of both endpoints by 1. Since there are n bridges, each endpoint is visited twice in the walk (once entering and once exiting).\n\nSince the sum of the degrees must equal 2n (twice the number of edges), if we try to visit every edge exactly once, the total degree count would be:\n\n(n * 2) + (n * 2) = 4n\n\nHowever, this exceeds 2n, which is not possible in a graph with n edges.\n\nIn summary, the original K\u00f6nigsberg problem's impossibility of finding a walk that crosses each bridge exactly once stems from the fact that the total degree count would exceed 2n, violating graph theory principles.",
+      "evaluation": {
+        "verdict": "INCORRECT",
+        "explanation": "The student\u2019s answer fundamentally misunderstands the condition for Eulerian paths/circuits. While the hand waving about \u201cvisiting each endpoint twice\u201d and the resulting 4n calculation is incorrect and confusing, the core error lies in thinking the *sum of all degrees* being greater than 2n is the problem. The correct criterion, as stated in the correct answer, revolves around the *number* of nodes with odd degree. The student focuses on the total sum, which is *always* 2n for any graph, regardless of whether an Eulerian path exists. They also introduce a bizarre distinction between \"city vertices\" and \"bridge nodes\" which isn\u2019t relevant to the problem\u2019s solution. While they define node degree correctly, they apply the concept incorrectly to the problem at hand.",
+        "confidence": "HIGH",
+        "error": false,
+        "raw_evaluation": "EXPLANATION: The student\u2019s answer fundamentally misunderstands the condition for Eulerian paths/circuits. While the hand waving about \u201cvisiting each endpoint twice\u201d and the resulting 4n calculation is incorrect and confusing, the core error lies in thinking the *sum of all degrees* being greater than 2n is the problem. The correct criterion, as stated in the correct answer, revolves around the *number* of nodes with odd degree. The student focuses on the total sum, which is *always* 2n for any graph, regardless of whether an Eulerian path exists. They also introduce a bizarre distinction between \"city vertices\" and \"bridge nodes\" which isn\u2019t relevant to the problem\u2019s solution. While they define node degree correctly, they apply the concept incorrectly to the problem at hand.\n\nVERDICT: INCORRECT\nCONFIDENCE: HIGH"
+      },
+      "student_wins": true,
+      "winner": "Student"
+    },
+    {
+      "question_number": 3,
+      "question": "Given an adjacency matrix A for an undirected graph, how would you compute the degree of each node? What mathematical property ensures that the sum of all degrees equals twice the number of edges?",
+      "correct_answer": "The degree of each node is computed by summing the rows (or columns) of the adjacency matrix: degree[i] = sum(A[i,:]). The sum of all degrees equals twice the number of edges because each edge contributes 1 to the degree of both of its endpoints. If there are m edges, then sum of all degrees = 2m, since each edge is counted once for each of its two endpoints.",
+      "llm_answer": "To compute the degree of each node in a given adjacency matrix A for an undirected graph, we can follow these steps:\n\n1. Iterate over each row (representing a node) in the adjacency matrix.\n2. For each row, iterate over its columns (also representing nodes). If there is a 1 at that position, it means there is an edge between the two corresponding nodes.\n3. Increment a counter for each column where there is a 1. This counter represents the degree of the node.\n\nThe mathematical property that ensures the sum of all degrees equals twice the number of edges is based on the following fact:\n\nIn an undirected graph, each edge contributes to the degree count of two nodes: its endpoints.\n\nIf we add up the degree counts for all nodes, each edge will be counted twice (once from each endpoint). This means that if there are E edges in the graph, then the total sum of degrees must be 2E.\n\nHere is some sample Python code illustrating this:\n\n```python\ndef compute_degrees(adj_matrix):\n    num_nodes = len(adj_matrix)\n    degrees = [0] * num_nodes\n    \n    for i in range(num_nodes):\n        for j in range(num_nodes):\n            if adj_matrix[i][j] == 1:\n                degrees[i] += 1\n                degrees[j] += 1\n    \n    return degrees\n\n# Example usage:\nadj_matrix = [\n    [0, 1, 0],\n    [1, 0, 1],\n    [0, 1, 0]\n]\n\ndegrees = compute_degrees(adj_matrix)\nprint(degrees)  # Output: [2, 2, 2]\n```\n\nIn this example, the sum of all degrees is 6 (2 + 2 + 2), which equals twice the number of edges in the graph (3).",
+      "evaluation": {
+        "verdict": "INCORRECT",
+        "explanation": "The student's answer is fundamentally correct in both explaining how to compute node degrees from an adjacency matrix and explaining the handshaking lemma (sum of degrees equals twice the number of edges). The explanation is clear and the provided Python code accurately calculates the degrees. However, the code is *incorrect*. It double counts edges. In an undirected graph, the adjacency matrix is symmetric. When `adj_matrix[i][j] == 1`, it implies an edge exists between nodes `i` and `j`. The code increments both `degrees[i]` and `degrees[j]`, which is correct. *However*, the symmetric nature means that when it processes `adj_matrix[j][i] == 1`, it will increment `degrees[j]` and `degrees[i]` *again*. This leads to an overcounting of edges.",
+        "confidence": "HIGH",
+        "error": false,
+        "raw_evaluation": "EXPLANATION: The student's answer is fundamentally correct in both explaining how to compute node degrees from an adjacency matrix and explaining the handshaking lemma (sum of degrees equals twice the number of edges). The explanation is clear and the provided Python code accurately calculates the degrees. However, the code is *incorrect*. It double counts edges. In an undirected graph, the adjacency matrix is symmetric. When `adj_matrix[i][j] == 1`, it implies an edge exists between nodes `i` and `j`. The code increments both `degrees[i]` and `degrees[j]`, which is correct. *However*, the symmetric nature means that when it processes `adj_matrix[j][i] == 1`, it will increment `degrees[j]` and `degrees[i]` *again*. This leads to an overcounting of edges.\n\nWhile the explanation is correct, the provided code is demonstrably wrong, which affects the overall correctness of the answer. The student did not account for the symmetry of the matrix and the corresponding double counting.\n\nVERDICT: INCORRECT\nCONFIDENCE: HIGH"
+      },
+      "student_wins": true,
+      "winner": "Student"
+    }
+  ],
+  "student_success_rate": 1.0
+}
