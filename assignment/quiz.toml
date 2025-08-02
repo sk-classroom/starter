@@ -1,0 +1,3 @@
+[[questions]]
+question = "What is an Euler path?"
+answer = "A path that visits every edge exactly once."
