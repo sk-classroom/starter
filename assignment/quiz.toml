@@ -1,3 +1,7 @@
 [[questions]]
 question = "What is an Euler path?"
 answer = "A path that visits every edge exactly once."
+
+[[questions]]
+question = "What is an Euler circuit?"
+answer = "A path that visits every edge exactly once and starts and ends at the same vertex."
