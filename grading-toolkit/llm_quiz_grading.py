@@ -760,11 +760,11 @@ STUDENT_WINS: [TRUE/FALSE] (TRUE if LLM got it wrong, FALSE if LLM got it right)
 
         # Add GitHub Classroom markers
         has_valid_questions = results["valid_questions"] > 0
-        student_passes = has_valid_questions and results["student_success_rate"] >= 0.5
+        student_passes = has_valid_questions and results["student_success_rate"] >= 1.0
         
         results["github_classroom_result"] = "STUDENTS_QUIZ_KEIKO_WIN" if student_passes else "STUDENTS_QUIZ_KEIKO_LOSE"
         results["student_passes"] = student_passes
-        results["pass_criteria"] = "At least one valid question AND win rate >= 50%"
+        results["pass_criteria"] = "At least one valid question AND win rate = 100% (stump LLM on ALL questions)"
 
         return results
 
@@ -812,9 +812,9 @@ STUDENT_WINS: [TRUE/FALSE] (TRUE if LLM got it wrong, FALSE if LLM got it right)
         feedback_lines = []
         
         # GitHub Classroom Markers - Determine pass/fail based on student success rate
-        # Student passes if they have at least one valid question and win at least 50% of them
+        # Student passes if they have at least one valid question and win 100% of them
         has_valid_questions = results['valid_questions'] > 0
-        student_passes = has_valid_questions and results['student_success_rate'] >= 0.5
+        student_passes = has_valid_questions and results['student_success_rate'] >= 1.0
         
         if student_passes:
             feedback_lines.append("STUDENTS_QUIZ_KEIKO_WIN")
@@ -843,7 +843,7 @@ STUDENT_WINS: [TRUE/FALSE] (TRUE if LLM got it wrong, FALSE if LLM got it right)
             if not has_valid_questions:
                 feedback_lines.append(f"❌ RESULT: FAIL - No valid questions submitted")
             else:
-                feedback_lines.append(f"❌ RESULT: FAIL - Need to win at least 50% of valid questions")
+                feedback_lines.append(f"❌ RESULT: FAIL - Need to win 100% of valid questions (stump the LLM on ALL questions)")
         
         # Detailed question analysis
         feedback_lines.append(f"\n{'='*80}")
