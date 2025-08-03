@@ -9,10 +9,11 @@ This script implements a quiz challenge where:
 4. Students win if they can stump the LLM
 
 Usage:
-    python llm_quiz_grading.py --quiz-file quiz.toml
+    python llm_quiz_grading.py --quiz-file quiz.toml --base-url https://api.example.com --api-key your-api-key
 
-Environment Variables:
-    CHAT_API: API key for the LLM endpoint (GitHub secret)
+Required Arguments:
+    --base-url: LLM API base URL
+    --api-key: API key for the LLM endpoint
 """
 
 import os
@@ -972,8 +973,10 @@ def main():
                        help='Accept raw question input instead of TOML file')
     parser.add_argument('--output', type=Path, default='challenge_results.json',
                        help='Output file for challenge results')
-    parser.add_argument('--base-url', type=str, default='https://chat.binghamton.edu/api',
-                       help='LLM API base URL')
+    parser.add_argument('--base-url', type=str, required=True,
+                       help='LLM API base URL (required)')
+    parser.add_argument('--api-key', type=str, required=True,
+                       help='API key for LLM endpoint (required)')
     parser.add_argument('--quiz-model', type=str, default='llama3.2:latest',
                        help='Model that attempts to answer questions')
     parser.add_argument('--evaluator-model', type=str, default='gemma3:27b',
@@ -990,11 +993,8 @@ def main():
     if args.quiz_file and args.raw_input:
         parser.error("Cannot specify both --quiz-file and --raw-input")
 
-    # Get API key from environment
-    api_key = os.getenv('CHAT_API')
-    if not api_key:
-        logger.error("CHAT_API environment variable not set")
-        sys.exit(1)
+    # Use API key from command line argument
+    api_key = args.api_key
 
     # Validate input files (only if using quiz file mode)
     if args.quiz_file and not args.quiz_file.exists():
