@@ -16,7 +16,7 @@ The LLM Quiz Challenge system works by:
 
 ### Installation
 ```bash
-# Clone the repository  
+# Clone the repository
 git clone <repository-url>
 cd grading-toolkit
 
@@ -38,8 +38,6 @@ python -m llm_quiz --quiz-file quiz.toml --api-key sk-xxx --subject-area "biolog
 ### Quiz File Format
 Create a `quiz.toml` file with your questions:
 ```toml
-title = "My Quiz"
-
 [[questions]]
 question = "What happens when you combine sodium and water?"
 answer = "Sodium reacts violently with water, producing sodium hydroxide and hydrogen gas, with significant heat release."
@@ -70,13 +68,13 @@ answer = "The reaction is never truly safe due to its violent nature, but it can
 # Basic usage with OpenRouter
 python -m llm_quiz --quiz-file quiz.toml --api-key sk-or-v1-xxx
 
-# Biology course with custom models  
+# Biology course with custom models
 python -m llm_quiz \
   --quiz-file biology_quiz.toml \
   --api-key sk-xxx \
   --subject-area "biology" \
-  --quiz-model "gpt-4" \
-  --evaluator-model "claude-3"
+  --quiz-model "gpt-4o-mini" \
+  --evaluator-model "gpt-4o"
 
 # Local Ollama instance
 python -m llm_quiz \
@@ -100,8 +98,8 @@ from llm_quiz import LLMQuizChallenge
 # Initialize the challenge system
 challenge = LLMQuizChallenge(
     base_url="https://openrouter.ai/api/v1",
-    quiz_model="phi4:latest",
-    evaluator_model="gemma3:27b", 
+    quiz_model="gpt-4o-mini",
+    evaluator_model="gpt-4o",
     api_key="sk-or-v1-your-key",
     subject_area="chemistry"
 )
@@ -171,21 +169,12 @@ python -m llm_quiz \
   --api-key "your-key"
 ```
 
-## 📊 Model Mapping
-
-The library automatically maps generic model names to provider-specific ones:
-
-| Generic Name | OpenRouter | Ollama | Notes |
-|--------------|------------|--------|-------|
-| `phi4:latest` | `microsoft/phi-4` | `phi4:latest` | Quiz taking |
-| `gemma3:27b` | `google/gemma-3-27b-it:free` | `gemma3:27b` | Evaluation |
-| `llama3.2:latest` | `mistralai/mistral-small-3.2-24b-instruct:free` | `llama3.2:latest` | Alternative |
 
 ## 🎯 Creating Effective Questions
 
 ### Question Types That Stump LLMs
 - **Edge cases**: Boundary conditions, exceptions, unusual scenarios
-- **Subtle distinctions**: Fine differences between similar concepts  
+- **Subtle distinctions**: Fine differences between similar concepts
 - **Multi-constraint problems**: Questions combining multiple factors
 - **Counterintuitive examples**: Results that seem wrong but are correct
 - **Failure modes**: When do methods/theories break down?
@@ -207,7 +196,7 @@ question = "In extreme drought conditions, what happens to CAM plant stomatal be
 answer = "CAM plants keep stomata closed during day to conserve water, while C4 plants may partially open stomata since their CO2 concentration mechanism is less water-efficient than CAM."
 ```
 
-#### History  
+#### History
 ```toml
 [[questions]]
 question = "What was the primary economic factor that made the Mali Empire's control of salt mines more strategically important than gold mines?"
@@ -255,9 +244,10 @@ The system outputs markers for automated grading:
 
 #### Model Not Found
 ```bash
-# Use provider-specific model names or let the system map them
---quiz-model "phi4:latest" # Generic (recommended)
---quiz-model "microsoft/phi-4" # OpenRouter specific
+# Use the exact model names supported by your API provider
+--quiz-model "gpt-4o-mini" # OpenAI/OpenRouter
+--quiz-model "llama3.2:latest" # Ollama
+--quiz-model "microsoft/phi-4" # OpenRouter specific path
 ```
 
 #### Validation Failures

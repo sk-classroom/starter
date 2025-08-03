@@ -65,7 +65,7 @@ Examples:
   python -m llm_quiz.cli --quiz-file quiz.toml --base-url http://localhost:11434/v1 --api-key dummy
 
   # Run with custom models
-  python -m llm_quiz.cli --quiz-file quiz.toml --api-key sk-xxx --quiz-model phi4:latest --evaluator-model gemma3:27b
+  python -m llm_quiz.cli --quiz-file quiz.toml --api-key sk-xxx --quiz-model gpt-4o-mini --evaluator-model gpt-4o
 
   # Save results and show verbose output
   python -m llm_quiz.cli --quiz-file quiz.toml --api-key sk-xxx --output results.json --verbose
@@ -101,14 +101,14 @@ GitHub Classroom Integration:
     # Model configuration
     parser.add_argument(
         "--quiz-model",
-        default="phi4:latest",
-        help="Model for taking the quiz (default: phi4:latest)"
+        default="gpt-4o-mini",
+        help="Model for taking the quiz (default: gpt-4o-mini)"
     )
     
     parser.add_argument(
         "--evaluator-model", 
-        default="gemma3:27b",
-        help="Model for evaluating answers (default: gemma3:27b)"
+        default="gpt-4o",
+        help="Model for evaluating answers (default: gpt-4o)"
     )
     
     # Module configuration
