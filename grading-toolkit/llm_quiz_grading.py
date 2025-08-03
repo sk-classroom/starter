@@ -719,6 +719,7 @@ STUDENT_WINS: [TRUE/FALSE] (TRUE if LLM got it wrong, FALSE if LLM got it right)
             "total_questions": len(questions),
             "valid_questions": 0,
             "invalid_questions": 0,
+            "system_errors": 0,  # Number of questions with system errors
             "student_wins": 0,  # Number of questions where LLM got it wrong
             "llm_wins": 0,      # Number of questions where LLM got it right
             "question_results": [],
@@ -781,12 +782,21 @@ STUDENT_WINS: [TRUE/FALSE] (TRUE if LLM got it wrong, FALSE if LLM got it right)
             
             if not llm_response["success"]:
                 logger.error(f"Failed to get LLM response for question {i+1}: {llm_response['error']}")
+                # When LLM fails to respond, this is a system error, not a student win
+                evaluation = {
+                    "success": True,
+                    "verdict": "SYSTEM_ERROR",
+                    "explanation": f"LLM failed to respond due to system issues: {llm_response['error']}",
+                    "confidence": "HIGH",
+                    "student_wins": False,  # System errors don't count as student wins
+                    "error": llm_response['error'],
+                    "raw_evaluation": f"System Error: {llm_response['error']}"
+                }
                 llm_answer = "No response from LLM"
             else:
                 llm_answer = llm_response["answer"]
-
-            # Step 4: Evaluate LLM answer against correct answer
-            evaluation = self.evaluate_llm_answer(question_text, correct_answer, llm_answer)
+                # Step 4: Evaluate LLM answer against correct answer
+                evaluation = self.evaluate_llm_answer(question_text, correct_answer, llm_answer)
 
             if not evaluation["success"]:
                 logger.error(f"Failed to evaluate question {i+1}: {evaluation['error']}")
@@ -800,11 +810,17 @@ STUDENT_WINS: [TRUE/FALSE] (TRUE if LLM got it wrong, FALSE if LLM got it right)
                     "error": evaluation["error"]
                 }
 
-            # Update win counts
-            if evaluation["student_wins"]:
+            # Update win counts (exclude system errors from win counting)
+            if evaluation["verdict"] == "SYSTEM_ERROR":
+                # System errors don't count toward wins for either side
+                results["system_errors"] += 1
+                winner = "System Error"
+            elif evaluation["student_wins"]:
                 results["student_wins"] += 1
+                winner = "Student"
             else:
                 results["llm_wins"] += 1
+                winner = "LLM"
 
             # Step 5: Collect results
             question_result = {
@@ -814,23 +830,27 @@ STUDENT_WINS: [TRUE/FALSE] (TRUE if LLM got it wrong, FALSE if LLM got it right)
                 "llm_answer": llm_answer,
                 "evaluation": evaluation,
                 "validation": validation,
-                "student_wins": evaluation["student_wins"],
-                "winner": "Student" if evaluation["student_wins"] else "LLM"
+                "student_wins": evaluation["student_wins"] if evaluation["verdict"] != "SYSTEM_ERROR" else False,
+                "winner": winner
             }
 
             results["question_results"].append(question_result)
 
-        # Calculate success rate based on valid questions only
-        if results["valid_questions"] > 0:
-            results["student_success_rate"] = results["student_wins"] / results["valid_questions"]
+        # Calculate success rate based on valid questions that were actually evaluated (exclude system errors)
+        evaluated_questions = results["student_wins"] + results["llm_wins"]
+        if evaluated_questions > 0:
+            results["student_success_rate"] = results["student_wins"] / evaluated_questions
+        else:
+            results["student_success_rate"] = 0.0
 
         # Add GitHub Classroom markers
         has_valid_questions = results["valid_questions"] > 0
-        student_passes = has_valid_questions and results["student_success_rate"] >= 1.0
+        has_evaluated_questions = evaluated_questions > 0
+        student_passes = has_valid_questions and has_evaluated_questions and results["student_success_rate"] >= 1.0
         
         results["github_classroom_result"] = "STUDENTS_QUIZ_KEIKO_WIN" if student_passes else "STUDENTS_QUIZ_KEIKO_LOSE"
         results["student_passes"] = student_passes
-        results["pass_criteria"] = "At least one valid question AND win rate = 100% (stump LLM on ALL questions)"
+        results["pass_criteria"] = "At least one valid question AND win rate = 100% (stump LLM on ALL questions, system errors excluded)"
 
         return results
 
@@ -898,6 +918,8 @@ STUDENT_WINS: [TRUE/FALSE] (TRUE if LLM got it wrong, FALSE if LLM got it right)
         feedback_lines.append(f"Valid Questions: {results['valid_questions']}")
         if results['invalid_questions'] > 0:
             feedback_lines.append(f"Invalid Questions: {results['invalid_questions']} ❌")
+        if results['system_errors'] > 0:
+            feedback_lines.append(f"System Errors: {results['system_errors']} ⚠️")
         feedback_lines.append(f"Student Wins: {results['student_wins']}")
         feedback_lines.append(f"LLM Wins: {results['llm_wins']}")
         feedback_lines.append(f"Student Success Rate: {results['student_success_rate']:.1%}")
@@ -926,6 +948,14 @@ STUDENT_WINS: [TRUE/FALSE] (TRUE if LLM got it wrong, FALSE if LLM got it right)
                 if result['validation']['issues']:
                     for issue in result['validation']['issues']:
                         feedback_lines.append(f"   • {issue}")
+                continue
+            elif result['evaluation']['verdict'] == 'SYSTEM_ERROR':
+                feedback_lines.append(f"\n⚠️  Question {result['question_number']}: SYSTEM ERROR")
+                feedback_lines.append(f"{'─'*60}")
+                feedback_lines.append(f"Question: {result['question']}")
+                feedback_lines.append(f"\n🔧 System Issues:")
+                feedback_lines.append(f"   {result['evaluation']['explanation']}")
+                feedback_lines.append(f"\n⚠️  Result: This question was not counted due to system errors.")
                 continue
                 
             winner_emoji = "🎉" if result['student_wins'] else "🤖"
@@ -971,6 +1001,10 @@ STUDENT_WINS: [TRUE/FALSE] (TRUE if LLM got it wrong, FALSE if LLM got it right)
         # Provide specific feedback based on results for valid questions
         if results['valid_questions'] == 0:
             feedback_lines.append(f"⚠️  No valid questions to evaluate. Please fix validation issues and try again.")
+        elif results['system_errors'] > 0 and (results['student_wins'] + results['llm_wins']) == 0:
+            feedback_lines.append(f"⚠️  All questions resulted in system errors. No evaluation could be performed.")
+            feedback_lines.append(f"🔧 This is typically due to model configuration issues or API problems.")
+            feedback_lines.append(f"   Contact your instructor or check the system configuration.")
         elif results['student_success_rate'] == 0:
             feedback_lines.append(f"🤖 The LLM answered all valid questions correctly. Here's how to create more challenging questions:")
             feedback_lines.append(f"")
