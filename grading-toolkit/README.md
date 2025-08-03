@@ -15,21 +15,62 @@ The LLM Quiz Challenge system works by:
 ## 🚀 Quick Start
 
 ### Installation
+
+#### Using uv (Recommended)
+```bash
+# Clone the repository
+git clone <repository-url>
+
+# Option 1: Run from parent directory
+cd assignments/starter  # or wherever the repo is
+uv run python -m grading-toolkit.llm_quiz --quiz-file quiz.toml --api-key sk-xxx
+
+# Option 2: Run from grading-toolkit directory
+cd grading-toolkit
+uv run python -m llm_quiz --quiz-file quiz.toml --api-key sk-xxx
+
+# Option 3: Create a virtual environment
+cd grading-toolkit
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+python -m llm_quiz --quiz-file quiz.toml --api-key sk-xxx
+```
+
+#### Traditional Python
 ```bash
 # Clone the repository
 git clone <repository-url>
 cd grading-toolkit
 
 # No additional dependencies required - uses Python standard library only
+python -m llm_quiz --help
 ```
 
 ### Basic Usage
-```bash
-# Using the CLI wrapper (backward compatible)
-python llm_quiz_grading.py --quiz-file quiz.toml --api-key sk-your-key
 
+#### With uv
+```bash
+# From grading-toolkit directory
+cd grading-toolkit
+uv run python -m llm_quiz --quiz-file quiz.toml --api-key sk-your-key
+
+# From parent directory (use full module path)
+uv run python -m grading-toolkit.llm_quiz --quiz-file quiz.toml --api-key sk-your-key
+
+# For specific subjects
+uv run python -m llm_quiz --quiz-file quiz.toml --api-key sk-xxx --subject-area "biology"
+
+# Using the CLI wrapper (backward compatible)
+uv run python grading-toolkit/llm_quiz_grading.py --quiz-file quiz.toml --api-key sk-your-key
+```
+
+#### With regular Python
+```bash
 # Using the library module
 python -m llm_quiz --quiz-file quiz.toml --api-key sk-your-key
+
+# Using the CLI wrapper (backward compatible)
+python llm_quiz_grading.py --quiz-file quiz.toml --api-key sk-your-key
 
 # For specific subjects
 python -m llm_quiz --quiz-file quiz.toml --api-key sk-xxx --subject-area "biology"
@@ -64,6 +105,38 @@ answer = "The reaction is never truly safe due to its violent nature, but it can
 - `--exit-on-fail`: Exit with error code if student fails (default: True)
 
 ### Examples
+
+#### With uv
+```bash
+# From grading-toolkit directory
+cd grading-toolkit
+
+# Basic usage with OpenRouter
+uv run python -m llm_quiz --quiz-file quiz.toml --api-key sk-or-v1-xxx
+
+# Biology course with custom models
+uv run python -m llm_quiz \
+  --quiz-file biology_quiz.toml \
+  --api-key sk-xxx \
+  --subject-area "biology" \
+  --quiz-model "gpt-4o-mini" \
+  --evaluator-model "gpt-4o"
+
+# Local Ollama instance
+uv run python -m llm_quiz \
+  --quiz-file quiz.toml \
+  --base-url http://localhost:11434/v1 \
+  --api-key dummy
+
+# Save detailed results
+uv run python -m llm_quiz \
+  --quiz-file quiz.toml \
+  --api-key sk-xxx \
+  --output results.json \
+  --verbose
+```
+
+#### With regular Python
 ```bash
 # Basic usage with OpenRouter
 python -m llm_quiz --quiz-file quiz.toml --api-key sk-or-v1-xxx
@@ -257,6 +330,20 @@ The system outputs markers for automated grading:
 - Provide clear, accurate answers
 
 ### Debugging
+
+#### With uv
+```bash
+# From grading-toolkit directory
+cd grading-toolkit
+
+# Enable verbose logging
+uv run python -m llm_quiz --quiz-file quiz.toml --api-key sk-xxx --verbose
+
+# Save detailed results for analysis
+uv run python -m llm_quiz --quiz-file quiz.toml --api-key sk-xxx --output debug.json
+```
+
+#### With regular Python
 ```bash
 # Enable verbose logging
 python -m llm_quiz --quiz-file quiz.toml --api-key sk-xxx --verbose
@@ -296,8 +383,21 @@ python -m llm_quiz --quiz-file quiz.toml --api-key sk-xxx --output debug.json
 ## 📋 Requirements
 
 - Python 3.7+
+- [uv](https://docs.astral.sh/uv/) (recommended) or pip
 - No external dependencies (uses standard library only)
 - API access to an OpenAI-compatible LLM provider
+
+### Installing uv
+```bash
+# macOS and Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Windows
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# With pip
+pip install uv
+```
 
 ## 🆘 Support
 

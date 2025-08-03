@@ -11,9 +11,9 @@ import numpy as np
 import sys
 import os
 
-assignment_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assignment"))
-sys.path.insert(0, assignment_path)
-from assignment import calc_square
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from assignment.assignment import calc_square
 
 # %% Test -----------
 x = np.random.randn(10)

@@ -17,18 +17,18 @@ jobs:
       id: task-1
       uses: classroom-resources/autograding-command-grader@v1
       with:
-        test-name: Task 1
+        test-name: Assignment - Test 1
         setup-command: pip install -r requirements.txt
-        command: bash grading-toolkit/grade_notebook.sh tests/test_01.py assignment/assignment.ipynb
+        command: uv run tests/test_01.py
         timeout: 10
         max-score: 5
     - name: Test 2
       id: test-2
       uses: classroom-resources/autograding-command-grader@v1
       with:
-        test-name: Test 2
+        test-name: Quiz Challenge
         setup-command: ''
-        command: bash grading-toolkit/grade_notebook.sh tests/test_02.py assignment/assignment.ipynb
+        command: uv run llm_quiz_grading.py --quiz-file ./quiz.toml --output test_results.json  --quiz-model "llama3.2:latest" --module m01-euler_tour
         timeout: 10
         max-score: 5
     - name: Task 3

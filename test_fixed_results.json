@@ -1,0 +1,85 @@
+{
+  "quiz_title": "Unknown Quiz",
+  "quiz_model": "google/gemma3:latest",
+  "evaluator_model": "google/gemma-3-27b-it:free",
+  "total_questions": 2,
+  "valid_questions": 2,
+  "invalid_questions": 0,
+  "system_errors": 2,
+  "student_wins": 0,
+  "llm_wins": 0,
+  "question_results": [
+    {
+      "question_number": 1,
+      "question": "What is an Euler path?",
+      "correct_answer": "A path that visits every edge exactly once.",
+      "llm_answer": "No response from LLM",
+      "evaluation": {
+        "success": true,
+        "verdict": "SYSTEM_ERROR",
+        "explanation": "LLM failed to respond due to system issues: LLM did not provide a response",
+        "confidence": "HIGH",
+        "student_wins": false,
+        "error": "LLM did not provide a response",
+        "raw_evaluation": "System Error: LLM did not provide a response"
+      },
+      "validation": {
+        "valid": true,
+        "issues": [],
+        "reason": "The question directly addresses the core concept of the module (Euler paths). The answer is a correct and concise definition of an Euler path \u2013 a path traversing each edge exactly once. There are no issues with math complexity, topic relevance, prompt injection, or answer quality.",
+        "raw_validation": "VALIDATION: PASS\nISSUES: None\nREASON: The question directly addresses the core concept of the module (Euler paths). The answer is a correct and concise definition of an Euler path \u2013 a path traversing each edge exactly once. There are no issues with math complexity, topic relevance, prompt injection, or answer quality."
+      },
+      "student_wins": false,
+      "winner": "System Error"
+    },
+    {
+      "question_number": 2,
+      "question": "What is an Euler circuit?",
+      "correct_answer": "A path that visits every edge exactly once and starts and ends at the same vertex.",
+      "llm_answer": "No response from LLM",
+      "evaluation": {
+        "success": true,
+        "verdict": "SYSTEM_ERROR",
+        "explanation": "LLM failed to respond due to system issues: LLM did not provide a response",
+        "confidence": "HIGH",
+        "student_wins": false,
+        "error": "LLM did not provide a response",
+        "raw_evaluation": "System Error: LLM did not provide a response"
+      },
+      "validation": {
+        "valid": true,
+        "issues": [],
+        "reason": "The question directly addresses a core concept of the \"euler_tour\" module (Euler circuits). The student's answer is a correct and well-formed definition of an Euler circuit. There are no issues with math, topic, prompt injection, or answer quality.",
+        "raw_validation": "VALIDATION: PASS\nISSUES: None\nREASON: The question directly addresses a core concept of the \"euler_tour\" module (Euler circuits). The student's answer is a correct and well-formed definition of an Euler circuit. There are no issues with math, topic, prompt injection, or answer quality."
+      },
+      "student_wins": false,
+      "winner": "System Error"
+    }
+  ],
+  "validation_results": [
+    {
+      "question_number": 1,
+      "question": "What is an Euler path?",
+      "validation": {
+        "valid": true,
+        "issues": [],
+        "reason": "The question directly addresses the core concept of the module (Euler paths). The answer is a correct and concise definition of an Euler path \u2013 a path traversing each edge exactly once. There are no issues with math complexity, topic relevance, prompt injection, or answer quality.",
+        "raw_validation": "VALIDATION: PASS\nISSUES: None\nREASON: The question directly addresses the core concept of the module (Euler paths). The answer is a correct and concise definition of an Euler path \u2013 a path traversing each edge exactly once. There are no issues with math complexity, topic relevance, prompt injection, or answer quality."
+      }
+    },
+    {
+      "question_number": 2,
+      "question": "What is an Euler circuit?",
+      "validation": {
+        "valid": true,
+        "issues": [],
+        "reason": "The question directly addresses a core concept of the \"euler_tour\" module (Euler circuits). The student's answer is a correct and well-formed definition of an Euler circuit. There are no issues with math, topic, prompt injection, or answer quality.",
+        "raw_validation": "VALIDATION: PASS\nISSUES: None\nREASON: The question directly addresses a core concept of the \"euler_tour\" module (Euler circuits). The student's answer is a correct and well-formed definition of an Euler circuit. There are no issues with math, topic, prompt injection, or answer quality."
+      }
+    }
+  ],
+  "student_success_rate": 0.0,
+  "github_classroom_result": "STUDENTS_QUIZ_KEIKO_LOSE",
+  "student_passes": false,
+  "pass_criteria": "At least one valid question AND win rate = 100% (stump LLM on ALL questions, system errors excluded)"
+}
