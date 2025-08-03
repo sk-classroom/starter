@@ -1,0 +1,117 @@
+{
+  "quiz_title": "Network Science Quiz",
+  "quiz_model": "llama3.2:latest",
+  "evaluator_model": "gemma3:27b",
+  "total_questions": 3,
+  "valid_questions": 3,
+  "invalid_questions": 0,
+  "student_wins": 0,
+  "llm_wins": 3,
+  "question_results": [
+    {
+      "question_number": 1,
+      "question": "According to Euler's Path Theorem, what are the necessary and sufficient conditions for a graph to have an Euler path (a walk that crosses every edge exactly once)?",
+      "correct_answer": "A graph has an Euler path if and only if: (1) All nodes have even degree, OR (2) Exactly two nodes have odd degree. If all nodes have even degree, the path forms a cycle. If exactly two nodes have odd degree, the path must start at one odd-degree node and end at the other.",
+      "llm_answer": "According to Euler's Path Theorem, a connected graph has an Euler path if and only if it has exactly zero or two vertices of odd degree. This means:\n\n1. **Zero Odd Degree Vertices**: If there are no vertices with an odd degree (all vertices have even degrees), the graph has an Euler circuit, which is also considered an Euler path.\n\n2. **Two Odd Degree Vertices**: If there are exactly two vertices with an odd degree, the graph has an Euler path that starts at one of these odd-degree vertices and ends at the other.\n\nIn summary, for a graph to have an Euler path, it must be connected and can have either zero or exactly two vertices of odd degree.",
+      "evaluation": {
+        "success": true,
+        "verdict": "CORRECT",
+        "explanation": "The student's answer and the LLM's answer are both correct and essentially state the same theorem. Both accurately describe the necessary and sufficient conditions for the existence of an Euler path: either all nodes have even degree (implying an Euler cycle exists, which is a special case of an Euler path), or exactly two nodes have odd degree. The LLM adds the clarification that the graph must be connected, which is also a crucial condition, though the question did not explicitly ask for it. Since the student's response doesn't *mention* connectedness, it isn't *wrong* to omit it, but the LLM's inclusion is a positive addition.",
+        "confidence": "HIGH",
+        "student_wins": false,
+        "error": null,
+        "raw_evaluation": "EXPLANATION: The student's answer and the LLM's answer are both correct and essentially state the same theorem. Both accurately describe the necessary and sufficient conditions for the existence of an Euler path: either all nodes have even degree (implying an Euler cycle exists, which is a special case of an Euler path), or exactly two nodes have odd degree. The LLM adds the clarification that the graph must be connected, which is also a crucial condition, though the question did not explicitly ask for it. Since the student's response doesn't *mention* connectedness, it isn't *wrong* to omit it, but the LLM's inclusion is a positive addition.\n\nVERDICT: CORRECT\nCONFIDENCE: HIGH\nSTUDENT_WINS: FALSE"
+      },
+      "validation": {
+        "valid": true,
+        "issues": [],
+        "reason": "The question and answer both accurately reflect Euler's Path Theorem, a core concept in graph theory and network science. There's no heavy math, off-topic content, prompt injection, or issues with the answer's correctness or form. It's a standard, well-formed question and answer.",
+        "raw_validation": "VALIDATION: PASS\nISSUES: None\nREASON: The question and answer both accurately reflect Euler's Path Theorem, a core concept in graph theory and network science. There's no heavy math, off-topic content, prompt injection, or issues with the answer's correctness or form. It's a standard, well-formed question and answer."
+      },
+      "student_wins": false,
+      "winner": "LLM"
+    },
+    {
+      "question_number": 2,
+      "question": "In the original K\u00f6nigsberg bridge problem, why was it impossible to find a walk that crosses each bridge exactly once? Explain using the concept of node degrees.",
+      "correct_answer": "It was impossible because all four landmasses (nodes) had an odd number of bridges (odd degree): North shore (3 bridges), South shore (3 bridges), Large island (5 bridges), and Small island (3 bridges). According to Euler's theorem, for an Euler path to exist, at most two nodes can have odd degree. Since all four nodes had odd degree, the desired walk was mathematically impossible.",
+      "llm_answer": "In the original K\u00f6nigsberg bridge problem, the goal is to determine whether there exists a path through the city that crosses each of its seven bridges exactly once. This can be analyzed using graph theory, specifically by examining the degrees of the nodes (vertices) in the corresponding graph.\n\nThe city of K\u00f6nigsberg and its bridges can be represented as a graph where the landmasses are vertices and the bridges are edges connecting these vertices. In this representation:\n- There are four landmasses: two large islands (A, B) and two riverbanks (C, D).\n- The connections (bridges) between them result in the following vertex degrees:\n  - Vertex A has degree 5.\n  - Vertex B has degree 3.\n  - Vertex C has degree 3.\n  - Vertex D has degree 3.\n\nIn graph theory, for a path to exist that crosses each edge exactly once (an Eulerian path), the graph must satisfy specific conditions regarding the degrees of its vertices:\n1. Exactly zero or two vertices have an odd degree (the rest must have even degrees).\n2. If there are exactly two vertices with an odd degree, these will be the start and end points of the Eulerian path.\n3. If all vertices have even degrees, then not only does an Eulerian path exist but also an Eulerian circuit (a closed path that starts and ends at the same vertex).\n\nIn this problem, four vertices (A, B, C, D) all have odd degrees (5, 3, 3, and 3 respectively). Since more than two vertices have odd degrees, it is impossible to find a walk that crosses each bridge exactly once. Thus, the K\u00f6nigsberg bridge configuration does not allow for an Eulerian path or circuit.",
+      "evaluation": {
+        "success": true,
+        "verdict": "CORRECT",
+        "explanation": "The LLM's answer is a completely correct and thorough explanation of why the K\u00f6nigsberg bridge problem has no solution. It correctly identifies the node degrees, states Euler's theorem accurately, and applies it to the problem to reach the correct conclusion. The explanation is clear, concise, and demonstrates a strong understanding of the underlying graph theory concepts. It's essentially a more detailed and slightly more formal version of the student's answer.",
+        "confidence": "HIGH",
+        "student_wins": false,
+        "error": null,
+        "raw_evaluation": "EXPLANATION: The LLM's answer is a completely correct and thorough explanation of why the K\u00f6nigsberg bridge problem has no solution. It correctly identifies the node degrees, states Euler's theorem accurately, and applies it to the problem to reach the correct conclusion. The explanation is clear, concise, and demonstrates a strong understanding of the underlying graph theory concepts. It's essentially a more detailed and slightly more formal version of the student's answer.\n\nVERDICT: CORRECT\nCONFIDENCE: HIGH\nSTUDENT_WINS: FALSE"
+      },
+      "validation": {
+        "valid": true,
+        "issues": [],
+        "reason": "The question and answer both accurately address the K\u00f6nigsberg bridge problem, a foundational example in graph theory and network science. The student correctly identifies the odd degree of each node and relates it to Euler's theorem for the existence of Eulerian paths. There are no heavy math problems, off-topic elements, or prompt injection attempts. The answer is clear, concise, and correct.",
+        "raw_validation": "VALIDATION: PASS\nISSUES: None\nREASON: The question and answer both accurately address the K\u00f6nigsberg bridge problem, a foundational example in graph theory and network science. The student correctly identifies the odd degree of each node and relates it to Euler's theorem for the existence of Eulerian paths. There are no heavy math problems, off-topic elements, or prompt injection attempts. The answer is clear, concise, and correct."
+      },
+      "student_wins": false,
+      "winner": "LLM"
+    },
+    {
+      "question_number": 3,
+      "question": "Given an adjacency matrix A for an undirected graph, how would you compute the degree of each node? What mathematical property ensures that the sum of all degrees equals twice the number of edges?",
+      "correct_answer": "The degree of each node is computed by summing the rows (or columns) of the adjacency matrix: degree[i] = sum(A[i,:]). The sum of all degrees equals twice the number of edges because each edge contributes 1 to the degree of both of its endpoints. If there are m edges, then sum of all degrees = 2m, since each edge is counted once for each of its two endpoints.",
+      "llm_answer": "To compute the degree of each node in an undirected graph given its adjacency matrix \\( A \\), follow these steps:\n\n1. **Degree Calculation:** The degree of a node is the number of connections (edges) it has to other nodes. In terms of the adjacency matrix, this can be computed by summing up the entries in each row (or column, since the matrix is symmetric for undirected graphs). Specifically, the degree \\( d_i \\) of node \\( i \\) is given by:\n   \\[\n   d_i = \\sum_{j} A[i][j]\n   \\]\n   where \\( A[i][j] \\) represents the entry in row \\( i \\) and column \\( j \\) of matrix \\( A \\).\n\n2. **Mathematical Property:** The sum of all degrees equals twice the number of edges due to the following property:\n\n   - In an undirected graph, each edge contributes to the degree count of both nodes it connects.\n   - If you consider a single edge between two nodes \\( u \\) and \\( v \\), this edge is counted once in the degree of node \\( u \\) and once in the degree of node \\( v \\).\n   - Therefore, when summing up all degrees for every node in the graph, each edge will be counted twice.\n\nMathematically, if there are \\( m \\) edges in total, then:\n\\[\n\\sum_{i} d_i = 2m\n\\]\nwhere \\( \\sum_{i} d_i \\) is the sum of the degrees of all nodes. This property arises from counting each edge twice (once for each endpoint), which confirms that the sum of all node degrees equals twice the number of edges in the graph.",
+      "evaluation": {
+        "success": true,
+        "verdict": "CORRECT",
+        "explanation": "The LLM's answer is completely correct and provides a clear and concise explanation of how to compute node degrees from an adjacency matrix and why the sum of degrees is twice the number of edges. It uses appropriate mathematical notation and explains the reasoning behind the property well. The explanation is equivalent to the student\u2019s, just more detailed.",
+        "confidence": "HIGH",
+        "student_wins": false,
+        "error": null,
+        "raw_evaluation": "EXPLANATION: The LLM's answer is completely correct and provides a clear and concise explanation of how to compute node degrees from an adjacency matrix and why the sum of degrees is twice the number of edges. It uses appropriate mathematical notation and explains the reasoning behind the property well. The explanation is equivalent to the student\u2019s, just more detailed.\n\nVERDICT: CORRECT\nCONFIDENCE: HIGH\nSTUDENT_WINS: FALSE"
+      },
+      "validation": {
+        "valid": true,
+        "issues": [],
+        "reason": "The question and answer are both valid and relevant to basic graph theory concepts (degree calculation and the Handshaking Lemma). The math involved is simple summation, not complex derivations. There are no signs of prompt injection, off-topic content, or answer quality issues.",
+        "raw_validation": "VALIDATION: PASS\nISSUES: None\nREASON: The question and answer are both valid and relevant to basic graph theory concepts (degree calculation and the Handshaking Lemma). The math involved is simple summation, not complex derivations. There are no signs of prompt injection, off-topic content, or answer quality issues."
+      },
+      "student_wins": false,
+      "winner": "LLM"
+    }
+  ],
+  "validation_results": [
+    {
+      "question_number": 1,
+      "question": "According to Euler's Path Theorem, what are the necessary and sufficient conditions for a graph to have an Euler path (a walk that crosses every edge exactly once)?",
+      "validation": {
+        "valid": true,
+        "issues": [],
+        "reason": "The question and answer both accurately reflect Euler's Path Theorem, a core concept in graph theory and network science. There's no heavy math, off-topic content, prompt injection, or issues with the answer's correctness or form. It's a standard, well-formed question and answer.",
+        "raw_validation": "VALIDATION: PASS\nISSUES: None\nREASON: The question and answer both accurately reflect Euler's Path Theorem, a core concept in graph theory and network science. There's no heavy math, off-topic content, prompt injection, or issues with the answer's correctness or form. It's a standard, well-formed question and answer."
+      }
+    },
+    {
+      "question_number": 2,
+      "question": "In the original K\u00f6nigsberg bridge problem, why was it impossible to find a walk that crosses each bridge exactly once? Explain using the concept of node degrees.",
+      "validation": {
+        "valid": true,
+        "issues": [],
+        "reason": "The question and answer both accurately address the K\u00f6nigsberg bridge problem, a foundational example in graph theory and network science. The student correctly identifies the odd degree of each node and relates it to Euler's theorem for the existence of Eulerian paths. There are no heavy math problems, off-topic elements, or prompt injection attempts. The answer is clear, concise, and correct.",
+        "raw_validation": "VALIDATION: PASS\nISSUES: None\nREASON: The question and answer both accurately address the K\u00f6nigsberg bridge problem, a foundational example in graph theory and network science. The student correctly identifies the odd degree of each node and relates it to Euler's theorem for the existence of Eulerian paths. There are no heavy math problems, off-topic elements, or prompt injection attempts. The answer is clear, concise, and correct."
+      }
+    },
+    {
+      "question_number": 3,
+      "question": "Given an adjacency matrix A for an undirected graph, how would you compute the degree of each node? What mathematical property ensures that the sum of all degrees equals twice the number of edges?",
+      "validation": {
+        "valid": true,
+        "issues": [],
+        "reason": "The question and answer are both valid and relevant to basic graph theory concepts (degree calculation and the Handshaking Lemma). The math involved is simple summation, not complex derivations. There are no signs of prompt injection, off-topic content, or answer quality issues.",
+        "raw_validation": "VALIDATION: PASS\nISSUES: None\nREASON: The question and answer are both valid and relevant to basic graph theory concepts (degree calculation and the Handshaking Lemma). The math involved is simple summation, not complex derivations. There are no signs of prompt injection, off-topic content, or answer quality issues."
+      }
+    }
+  ],
+  "student_success_rate": 0.0,
+  "github_classroom_result": "STUDENTS_QUIZ_KEIKO_LOSE",
+  "student_passes": false,
+  "pass_criteria": "At least one valid question AND win rate = 100% (stump LLM on ALL questions)"
+}
