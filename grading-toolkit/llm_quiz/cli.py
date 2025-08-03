@@ -11,7 +11,7 @@ import logging
 from pathlib import Path
 from typing import Optional
 
-from .core import LLMQuizChallenge
+from .challenge import LLMQuizChallenge
 
 logger = logging.getLogger(__name__)
 
@@ -58,14 +58,14 @@ Examples:
   # Run with default OpenRouter settings
   python -m llm_quiz.cli --quiz-file quiz.toml --api-key sk-or-v1-xxx
 
-  # Run with custom subject area
-  python -m llm_quiz.cli --quiz-file quiz.toml --api-key sk-xxx --subject-area "biology"
-
   # Run with custom Ollama instance
   python -m llm_quiz.cli --quiz-file quiz.toml --base-url http://localhost:11434/v1 --api-key dummy
 
   # Run with custom models
   python -m llm_quiz.cli --quiz-file quiz.toml --api-key sk-xxx --quiz-model gpt-4o-mini --evaluator-model gpt-4o
+
+  # Load context from URLs file
+  python -m llm_quiz.cli --quiz-file quiz.toml --api-key sk-xxx --context-urls context_urls.txt
 
   # Save results and show verbose output
   python -m llm_quiz.cli --quiz-file quiz.toml --api-key sk-xxx --output results.json --verbose
@@ -111,16 +111,10 @@ GitHub Classroom Integration:
         help="Model for evaluating answers (default: gpt-4o)"
     )
     
-    # Module configuration
+    # Context configuration
     parser.add_argument(
-        "--module",
-        help="Module name for context loading (e.g., m01-euler_tour)"
-    )
-    
-    parser.add_argument(
-        "--subject-area",
-        default="course materials",
-        help="Subject area for validation (e.g., 'network science', 'biology', 'history')"
+        "--context-urls",
+        help="File containing URLs to fetch for context (one URL per line)"
     )
     
     # Output configuration
@@ -165,38 +159,37 @@ def main():
         logger.info(f"Base URL: {args.base_url}")
         logger.info(f"Quiz Model: {args.quiz_model}")
         logger.info(f"Evaluator Model: {args.evaluator_model}")
-        logger.info(f"Subject Area: {args.subject_area}")
-        if args.module:
-            logger.info(f"Module: {args.module}")
+        if args.context_urls:
+            logger.info(f"Context URLs file: {args.context_urls}")
         
         challenge = LLMQuizChallenge(
+            api_key=args.api_key,
             base_url=args.base_url,
             quiz_model=args.quiz_model,
-            evaluator_model=args.evaluator_model,
-            api_key=args.api_key,
-            module_name=args.module,
-            subject_area=args.subject_area
+            evaluator_model=args.evaluator_model
         )
         
-        # Load quiz from file
-        logger.info(f"Loading quiz from {args.quiz_file}")
-        quiz_data = challenge.load_quiz(args.quiz_file)
+        # Load context if provided
+        if args.context_urls:
+            context_loaded = challenge.load_context_from_urls_file(args.context_urls)
+            if not context_loaded:
+                logger.warning("Failed to load context from URLs file")
         
         # Run the challenge
         logger.info("Starting quiz challenge...")
-        results = challenge.run_sequential_challenge(quiz_data)
+        results = challenge.run_quiz_from_file(args.quiz_file)
         
         # Generate and display feedback
-        feedback = challenge.generate_student_feedback(results)
+        feedback = challenge.get_student_feedback(results)
         print(feedback)
         
         # Save results if requested
         if args.output:
-            challenge.save_results(results, args.output)
+            challenge.save_results(args.output, results)
             logger.info(f"Detailed results saved to {args.output}")
         
         # Exit with appropriate code for GitHub Classroom
-        if args.exit_on_fail and not results["student_passes"]:
+        if args.exit_on_fail and not results.student_passes:
             logger.info("Student did not pass grading criteria")
             sys.exit(1)
         else:

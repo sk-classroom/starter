@@ -36,16 +36,6 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 python -m llm_quiz --quiz-file quiz.toml --api-key sk-xxx
 ```
 
-#### Traditional Python
-```bash
-# Clone the repository
-git clone <repository-url>
-cd grading-toolkit
-
-# No additional dependencies required - uses Python standard library only
-python -m llm_quiz --help
-```
-
 ### Basic Usage
 
 #### With uv
@@ -57,8 +47,8 @@ uv run python -m llm_quiz --quiz-file quiz.toml --api-key sk-your-key
 # From parent directory (use full module path)
 uv run python -m grading-toolkit.llm_quiz --quiz-file quiz.toml --api-key sk-your-key
 
-# For specific subjects
-uv run python -m llm_quiz --quiz-file quiz.toml --api-key sk-xxx --subject-area "biology"
+# With context from URLs
+uv run python -m llm_quiz --quiz-file quiz.toml --api-key sk-xxx --context-urls context_urls.txt
 
 # Using the CLI wrapper (backward compatible)
 uv run python grading-toolkit/llm_quiz_grading.py --quiz-file quiz.toml --api-key sk-your-key
@@ -72,8 +62,8 @@ python -m llm_quiz --quiz-file quiz.toml --api-key sk-your-key
 # Using the CLI wrapper (backward compatible)
 python llm_quiz_grading.py --quiz-file quiz.toml --api-key sk-your-key
 
-# For specific subjects
-python -m llm_quiz --quiz-file quiz.toml --api-key sk-xxx --subject-area "biology"
+# With context from URLs
+python -m llm_quiz --quiz-file quiz.toml --api-key sk-xxx --context-urls context_urls.txt
 ```
 
 ### Quiz File Format
@@ -96,10 +86,9 @@ answer = "The reaction is never truly safe due to its violent nature, but it can
 
 ### Optional Arguments
 - `--base-url`: API endpoint (default: OpenRouter)
-- `--subject-area`: Subject for validation (default: "course materials")
-- `--quiz-model`: Model for answering questions (default: "phi4:latest")
-- `--evaluator-model`: Model for evaluating answers (default: "gemma3:27b")
-- `--module`: Module name for context loading
+- `--quiz-model`: Model for answering questions (default: "gpt-4o-mini")
+- `--evaluator-model`: Model for evaluating answers (default: "gpt-4o")
+- `--context-urls`: File containing URLs for context loading
 - `--output`: JSON file for detailed results
 - `--verbose`: Enable detailed logging
 - `--exit-on-fail`: Exit with error code if student fails (default: True)
@@ -114,11 +103,11 @@ cd grading-toolkit
 # Basic usage with OpenRouter
 uv run python -m llm_quiz --quiz-file quiz.toml --api-key sk-or-v1-xxx
 
-# Biology course with custom models
+# Quiz with context materials and custom models
 uv run python -m llm_quiz \
-  --quiz-file biology_quiz.toml \
+  --quiz-file quiz.toml \
   --api-key sk-xxx \
-  --subject-area "biology" \
+  --context-urls "lecture_urls.txt" \
   --quiz-model "gpt-4o-mini" \
   --evaluator-model "gpt-4o"
 
@@ -141,11 +130,11 @@ uv run python -m llm_quiz \
 # Basic usage with OpenRouter
 python -m llm_quiz --quiz-file quiz.toml --api-key sk-or-v1-xxx
 
-# Biology course with custom models
+# Quiz with context materials and custom models
 python -m llm_quiz \
-  --quiz-file biology_quiz.toml \
+  --quiz-file quiz.toml \
   --api-key sk-xxx \
-  --subject-area "biology" \
+  --context-urls "lecture_urls.txt" \
   --quiz-model "gpt-4o-mini" \
   --evaluator-model "gpt-4o"
 
@@ -168,13 +157,21 @@ python -m llm_quiz \
 ```python
 from llm_quiz import LLMQuizChallenge
 
-# Initialize the challenge system
+# Basic initialization
+challenge = LLMQuizChallenge(
+    base_url="https://openrouter.ai/api/v1",
+    quiz_model="gpt-4o-mini",
+    evaluator_model="gpt-4o",
+    api_key="sk-or-v1-your-key"
+)
+
+# With context from URLs
 challenge = LLMQuizChallenge(
     base_url="https://openrouter.ai/api/v1",
     quiz_model="gpt-4o-mini",
     evaluator_model="gpt-4o",
     api_key="sk-or-v1-your-key",
-    subject_area="chemistry"
+    context_urls_file="context_urls.txt"
 )
 
 # Load and run quiz
@@ -189,28 +186,70 @@ print(feedback)
 challenge.save_results(results, "results.json")
 ```
 
-## 🏫 Subject Areas
+## 📚 Context Loading from URLs
 
-The library works with any academic subject. Examples:
+The library can automatically fetch content from any URLs to provide context to the quiz-taking LLM.
 
-### STEM Subjects
-- `--subject-area "biology"`
-- `--subject-area "chemistry"`
-- `--subject-area "physics"`
-- `--subject-area "computer science"`
-- `--subject-area "mathematics"`
+### URL File Format
 
-### Humanities
-- `--subject-area "history"`
-- `--subject-area "literature"`
-- `--subject-area "philosophy"`
-- `--subject-area "linguistics"`
+Create a text file containing URLs (one per line). Comments starting with `#` are ignored:
 
-### Social Sciences
-- `--subject-area "psychology"`
-- `--subject-area "sociology"`
-- `--subject-area "economics"`
-- `--subject-area "political science"`
+```txt
+# Context URLs for Biology Course
+https://raw.githubusercontent.com/professor/bio-course/main/lecture-01.md
+https://raw.githubusercontent.com/professor/bio-course/main/exercises-01.py
+https://docs.example.com/api/course-materials/chapter1.txt
+https://university.edu/courses/bio101/notes.md
+
+# Additional materials
+https://raw.githubusercontent.com/professor/bio-course/main/reading-list.md
+```
+
+### Examples
+
+#### Basic Context Loading
+```bash
+# Load context from URLs file
+uv run python -m llm_quiz \
+  --quiz-file quiz.toml \
+  --api-key sk-xxx \
+  --context-urls "context_urls.txt"
+```
+
+#### Different Content Sources
+```bash
+# Mix GitHub, documentation sites, and other sources
+# context_urls.txt contains:
+# https://raw.githubusercontent.com/user/course/main/lecture.md
+# https://docs.university.edu/course/chapter1.html
+# https://api.example.com/materials/exercises.json
+
+uv run python -m llm_quiz \
+  --quiz-file quiz.toml \
+  --api-key sk-xxx \
+  --context-urls "mixed_sources.txt"
+```
+
+### Supported URL Types
+
+The library can fetch content from any publicly accessible URL:
+
+- **GitHub Raw Files**: `https://raw.githubusercontent.com/user/repo/branch/file.md`
+- **Documentation Sites**: `https://docs.example.com/content.html`
+- **API Endpoints**: `https://api.example.com/materials/text`
+- **University Portals**: `https://university.edu/courses/content.txt`
+- **Any Public URL**: Any URL returning text content
+
+## 📚 Context Materials
+
+The library works with any type of course materials provided via URLs. The context helps the quiz-taking LLM understand the specific content being tested.
+
+### Content Types Supported
+- **Lecture Notes**: Markdown, HTML, or plain text files
+- **Code Examples**: Python, JavaScript, or any programming language
+- **Documentation**: API docs, course websites, reference materials
+- **Academic Papers**: Text content from research papers
+- **Exercise Files**: Problem sets, solutions, practice materials
 
 ## 🔧 API Provider Configuration
 
@@ -251,7 +290,7 @@ python -m llm_quiz \
 - **Multi-constraint problems**: Questions combining multiple factors
 - **Counterintuitive examples**: Results that seem wrong but are correct
 - **Failure modes**: When do methods/theories break down?
-- **Parameter sensitivity**: Behavior at specific values
+- **Context-specific details**: Questions requiring knowledge of provided materials
 
 ### Question Types LLMs Handle Easily
 - Basic definitions and explanations
@@ -260,7 +299,7 @@ python -m llm_quiz \
 - Simple step-by-step procedures
 - Obvious keyword-based questions
 
-### Examples by Subject
+### Examples by Content Type
 
 #### Biology
 ```toml
@@ -286,11 +325,10 @@ answer = "Diamond has higher density than graphite, so increased pressure shifts
 ## ✅ Question Validation System
 
 Questions are automatically validated for:
-- ✅ **Relevance** to specified subject area
 - ❌ **Heavy math** (no complex derivations)
-- ❌ **Off-topic content** (must relate to course)
 - ❌ **Prompt injection** (no AI manipulation attempts)
 - ✅ **Answer quality** (accurate and complete)
+- ✅ **Context relevance** (when context materials are provided)
 
 ## 🎓 GitHub Classroom Integration
 
@@ -324,10 +362,10 @@ The system outputs markers for automated grading:
 ```
 
 #### Validation Failures
-- Ensure questions relate to your specified subject area
 - Avoid complex mathematical derivations
 - Don't include prompt injection attempts
 - Provide clear, accurate answers
+- When using context materials, ensure questions relate to the provided content
 
 ### Debugging
 
