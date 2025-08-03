@@ -40,11 +40,61 @@ class LLMQuizChallenge:
     def __init__(self, base_url: str, quiz_model: str, evaluator_model: str, api_key: str, module_name: str = None):
         """Initialize the challenge system with LLM endpoint configuration."""
         self.base_url = base_url.rstrip('/')
-        self.quiz_model = quiz_model  # Model that attempts to answer (llama3.2:latest)
-        self.evaluator_model = evaluator_model  # Model that evaluates correctness (gemma3:27b)
         self.api_key = api_key
         self.module_name = module_name
         self.module_context = self.load_module_content(module_name) if module_name else None
+        
+        # Map models based on API provider
+        self.quiz_model = self._map_model(quiz_model, "quiz")
+        self.evaluator_model = self._map_model(evaluator_model, "evaluator")
+        
+        logger.info(f"Using models: quiz={self.quiz_model}, evaluator={self.evaluator_model}")
+
+    def _map_model(self, model_name: str, model_type: str = None) -> str:
+        """Map generic model names to provider-specific model names."""
+        # If already a provider-specific model name, return as-is
+        if "/" in model_name:
+            return model_name
+            
+        # Detect API provider from base URL
+        provider = self._detect_provider()
+        
+        # Model mapping for different providers
+        model_mappings = {
+            "openrouter": {
+                "llama3.2:latest": "mistralai/mistral-small-3.2-24b-instruct:free",  # Using Mistral as alternative
+                "gemma3:27b": "google/gemma-3-27b-it:free",
+                "phi4:latest": "microsoft/phi-4",
+            },
+            "ollama": {
+                "llama3.2:latest": "llama3.2:latest", 
+                "gemma3:27b": "gemma3:27b",
+                "phi4:latest": "phi4:latest",
+            },
+            "default": {
+                "llama3.2:latest": "llama3.2:latest",
+                "gemma3:27b": "gemma3:27b", 
+                "phi4:latest": "phi4:latest",
+            }
+        }
+        
+        mapping = model_mappings.get(provider, model_mappings["default"])
+        mapped_model = mapping.get(model_name, model_name)
+        
+        if mapped_model != model_name:
+            logger.info(f"Mapped {model_name} -> {mapped_model} for {provider}")
+            
+        return mapped_model
+    
+    def _detect_provider(self) -> str:
+        """Detect API provider from base URL."""
+        url_lower = self.base_url.lower()
+        if "openrouter" in url_lower:
+            return "openrouter"
+        elif "ollama" in url_lower or ":11434" in url_lower:
+            return "ollama"
+        else:
+            return "default"
 
     def load_module_content(self, module_name: str) -> Optional[str]:
         """Automatically fetch and concatenate module content files."""
@@ -150,11 +200,19 @@ class LLMQuizChallenge:
                 "messages": messages,
                 "max_tokens": max_tokens,
                 "temperature": temperature,
-                "stream": False,
-                "options": {
-                    "num_ctx": num_ctx
-                }
+                "stream": False
             }
+            
+            # Add provider-specific parameters
+            provider = self._detect_provider()
+            if provider == "ollama":
+                payload["options"] = {"num_ctx": num_ctx}
+            elif provider == "openrouter":
+                # OpenRouter uses standard OpenAI format, no special options needed
+                pass
+            else:
+                # Default/OpenAI format
+                pass
 
             logger.debug(f"Making API call to {self.base_url}/chat/completions with model {model}, temp={temperature}, max_tokens={max_tokens}")
 
@@ -234,7 +292,7 @@ Instructions:
         
         llm_response = self.call_llm(
             prompt=prompt,
-            model="phi4:latest",
+            model=self.quiz_model,
             temperature=0.1,
             max_tokens=500,
             system_message=system_message
@@ -339,7 +397,7 @@ ANSWER_2: MISSING"""
 
         response = self.call_llm(
             prompt=prompt,
-            model="gemma3:27b",
+            model=self.evaluator_model,
             temperature=0.1,
             max_tokens=400,
             system_message=system_message
@@ -484,7 +542,7 @@ REASON: [Brief explanation of decision]"""
 
         validation = self.call_llm(
             prompt=prompt,
-            model="gemma3:27b",
+            model=self.evaluator_model,
             temperature=0.1,
             max_tokens=500,
             num_ctx=3000,
@@ -564,7 +622,7 @@ STUDENT_WINS: [TRUE/FALSE] (TRUE if LLM got it wrong, FALSE if LLM got it right)
         
         evaluation = self.call_llm(
             prompt=prompt,
-            model="gemma3:27b",
+            model=self.evaluator_model,
             temperature=0.1,
             max_tokens=400,
             system_message=system_message
