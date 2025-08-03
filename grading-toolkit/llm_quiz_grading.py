@@ -68,16 +68,19 @@ class LLMQuizChallenge:
             "openrouter": {
                 "llama3.2:latest": "mistralai/mistral-small-3.2-24b-instruct:free",  # Using Mistral as alternative
                 "gemma3:27b": "google/gemma-3-27b-it:free",
+                "gemma3:latest": "google/gemma-3-27b-it:free",  # Map gemma3:latest to 27b version
                 "phi4:latest": "microsoft/phi-4",
             },
             "ollama": {
                 "llama3.2:latest": "llama3.2:latest", 
                 "gemma3:27b": "gemma3:27b",
+                "gemma3:latest": "gemma3:latest",
                 "phi4:latest": "phi4:latest",
             },
             "default": {
                 "llama3.2:latest": "llama3.2:latest",
                 "gemma3:27b": "gemma3:27b", 
+                "gemma3:latest": "gemma3:latest",
                 "phi4:latest": "phi4:latest",
             }
         }
