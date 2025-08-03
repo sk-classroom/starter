@@ -1059,6 +1059,14 @@ def main():
         print(feedback)
 
         print(f"\nDetailed results saved to: {args.output}")
+        
+        # Exit with error code if student fails grading criteria
+        if not results.get("student_passes", False):
+            logger.error("Student failed grading criteria - exiting with error code")
+            sys.exit(1)
+        else:
+            logger.info("Student passed grading criteria - exiting successfully")
+            sys.exit(0)
 
     except Exception as e:
         logger.error(f"Challenge failed: {e}")
