@@ -1061,7 +1061,7 @@ def main():
     api_key = args.api_key
     
     # Validate API key for OpenRouter
-    if "openrouter" in args.base_url.lower() and not api_key:
+    if "openrouter" in args.base_url.lower() and (not api_key or not api_key.strip()):
         logger.error("API key is required for OpenRouter. Set LLM_API_KEY environment variable or use --api-key")
         sys.exit(1)
 
