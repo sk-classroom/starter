@@ -1036,11 +1036,11 @@ def main():
     parser.add_argument('--output', type=Path, default='challenge_results.json',
                        help='Output file for challenge results')
     parser.add_argument('--base-url', type=str, 
-                       default=os.getenv('LLM_BASE_URL', 'http://localhost:11434/v1'),
-                       help='LLM API base URL (default: http://localhost:11434/v1 or LLM_BASE_URL env var)')
+                       default=os.getenv('LLM_BASE_URL', 'https://openrouter.ai/api/v1'),
+                       help='LLM API base URL (default: https://openrouter.ai/api/v1 or LLM_BASE_URL env var)')
     parser.add_argument('--api-key', type=str, 
-                       default=os.getenv('LLM_API_KEY', 'dummy'),
-                       help='API key for LLM endpoint (default: "dummy" or LLM_API_KEY env var)')
+                       default=os.getenv('LLM_API_KEY', ''),
+                       help='API key for LLM endpoint (required for OpenRouter, or use LLM_API_KEY env var)')
     parser.add_argument('--quiz-model', type=str, default='llama3.2:latest',
                        help='Model that attempts to answer questions')
     parser.add_argument('--evaluator-model', type=str, default='gemma3:27b',
@@ -1059,6 +1059,11 @@ def main():
 
     # Use API key from command line argument
     api_key = args.api_key
+    
+    # Validate API key for OpenRouter
+    if "openrouter" in args.base_url.lower() and not api_key:
+        logger.error("API key is required for OpenRouter. Set LLM_API_KEY environment variable or use --api-key")
+        sys.exit(1)
 
     # Validate input files (only if using quiz file mode)
     if args.quiz_file and not args.quiz_file.exists():
