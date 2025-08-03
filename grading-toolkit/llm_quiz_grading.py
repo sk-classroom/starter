@@ -52,6 +52,10 @@ class LLMQuizChallenge:
 
     def _map_model(self, model_name: str, model_type: str = None) -> str:
         """Map generic model names to provider-specific model names."""
+        # Handle empty or None model names
+        if not model_name or model_name.strip() == "":
+            model_name = "llama3.2:latest" if model_type == "quiz" else "gemma3:27b"
+            
         # If already a provider-specific model name, return as-is
         if "/" in model_name:
             return model_name
@@ -1031,10 +1035,12 @@ def main():
                        help='Accept raw question input instead of TOML file')
     parser.add_argument('--output', type=Path, default='challenge_results.json',
                        help='Output file for challenge results')
-    parser.add_argument('--base-url', type=str, required=True,
-                       help='LLM API base URL (required)')
-    parser.add_argument('--api-key', type=str, required=True,
-                       help='API key for LLM endpoint (required)')
+    parser.add_argument('--base-url', type=str, 
+                       default=os.getenv('LLM_BASE_URL', 'http://localhost:11434/v1'),
+                       help='LLM API base URL (default: http://localhost:11434/v1 or LLM_BASE_URL env var)')
+    parser.add_argument('--api-key', type=str, 
+                       default=os.getenv('LLM_API_KEY', 'dummy'),
+                       help='API key for LLM endpoint (default: "dummy" or LLM_API_KEY env var)')
     parser.add_argument('--quiz-model', type=str, default='llama3.2:latest',
                        help='Model that attempts to answer questions')
     parser.add_argument('--evaluator-model', type=str, default='gemma3:27b',
@@ -1060,8 +1066,12 @@ def main():
         sys.exit(1)
 
     try:
+        # Handle empty model arguments
+        quiz_model = args.quiz_model if args.quiz_model and args.quiz_model.strip() else "llama3.2:latest"
+        evaluator_model = args.evaluator_model if args.evaluator_model and args.evaluator_model.strip() else "gemma3:27b"
+        
         # Initialize challenge system
-        challenge = LLMQuizChallenge(args.base_url, args.quiz_model, args.evaluator_model, api_key, args.module)
+        challenge = LLMQuizChallenge(args.base_url, quiz_model, evaluator_model, api_key, args.module)
 
         # Run challenge based on input mode
         if args.raw_input:
