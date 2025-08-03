@@ -24,7 +24,8 @@ class LLMQuizChallenge:
     """
     
     def __init__(self, api_key: str, base_url: str = "https://openrouter.ai/api/v1",
-                 quiz_model: str = "gpt-4o-mini", evaluator_model: str = "gpt-4o"):
+                 quiz_model: str = "gpt-4o-mini", evaluator_model: str = "gpt-4o",
+                 context_window_size: int = 32768):
         """Initialize the quiz challenge system.
         
         Args:
@@ -32,8 +33,10 @@ class LLMQuizChallenge:
             base_url: Base URL for LLM API (default: OpenRouter)
             quiz_model: Model for answering questions (default: gpt-4o-mini)
             evaluator_model: Model for evaluating answers (default: gpt-4o)
+            context_window_size: Context window size for models (default: 32768)
         """
-        self.llm_client = LLMClient(base_url=base_url, api_key=api_key)
+        self.llm_client = LLMClient(base_url=base_url, api_key=api_key, 
+                                   context_window_size=context_window_size)
         self.quiz_runner = QuizRunner(
             llm_client=self.llm_client,
             quiz_model=quiz_model,
@@ -296,16 +299,17 @@ class LLMQuizChallenge:
     # Convenience methods for notebook workflows
     
     @classmethod
-    def quick_setup(cls, api_key: str) -> 'LLMQuizChallenge':
+    def quick_setup(cls, api_key: str, context_window_size: int = 32768) -> 'LLMQuizChallenge':
         """Quick setup with default configuration.
         
         Args:
             api_key: API key for LLM service
+            context_window_size: Context window size for models (default: 32768)
             
         Returns:
             Configured LLMQuizChallenge instance
         """
-        return cls(api_key=api_key)
+        return cls(api_key=api_key, context_window_size=context_window_size)
     
     def quick_run(self, quiz_file: Union[str, Path], context_urls: Optional[List[str]] = None) -> str:
         """Run a complete quiz challenge with minimal setup.

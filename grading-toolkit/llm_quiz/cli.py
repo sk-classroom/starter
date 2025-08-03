@@ -117,6 +117,13 @@ GitHub Classroom Integration:
         help="File containing URLs to fetch for context (one URL per line)"
     )
     
+    parser.add_argument(
+        "--context-window-size",
+        type=int,
+        default=32768,
+        help="Context window size for LLM models (default: 32768)"
+    )
+    
     # Output configuration
     parser.add_argument(
         "--output",
@@ -159,6 +166,7 @@ def main():
         logger.info(f"Base URL: {args.base_url}")
         logger.info(f"Quiz Model: {args.quiz_model}")
         logger.info(f"Evaluator Model: {args.evaluator_model}")
+        logger.info(f"Context Window Size: {args.context_window_size}")
         if args.context_urls:
             logger.info(f"Context URLs file: {args.context_urls}")
         
@@ -166,7 +174,8 @@ def main():
             api_key=args.api_key,
             base_url=args.base_url,
             quiz_model=args.quiz_model,
-            evaluator_model=args.evaluator_model
+            evaluator_model=args.evaluator_model,
+            context_window_size=args.context_window_size
         )
         
         # Load context if provided

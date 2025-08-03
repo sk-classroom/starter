@@ -75,20 +75,23 @@ class LLMRateLimitError(LLMClientError):
 class LLMClient:
     """Client for interacting with LLM APIs."""
     
-    def __init__(self, base_url: str, api_key: str, timeout: int = 30):
+    def __init__(self, base_url: str, api_key: str, timeout: int = 30, context_window_size: int = 32768):
         """Initialize the LLM client.
         
         Args:
             base_url: Base URL for the LLM API endpoint
             api_key: API key for authentication
             timeout: Request timeout in seconds
+            context_window_size: Context window size for models (default: 32768)
         """
         self.base_url = base_url.rstrip('/')
         self.api_key = api_key
         self.timeout = timeout
+        self.context_window_size = context_window_size
         self.provider = self._detect_provider()
         
         logger.info(f"Initialized LLM client for {self.provider.value} at {self.base_url}")
+        logger.info(f"Context window size: {self.context_window_size}")
     
     def _detect_provider(self) -> LLMProvider:
         """Detect the LLM provider based on the base URL."""
@@ -206,7 +209,7 @@ class LLMClient:
         # Add provider-specific parameters
         if self.provider == LLMProvider.OLLAMA:
             # Ollama supports additional options
-            payload["options"] = {"num_ctx": 32768}
+            payload["options"] = {"num_ctx": self.context_window_size}
         
         # Add any extra parameters
         payload.update(request.extra_params)

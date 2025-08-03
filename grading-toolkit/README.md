@@ -38,6 +38,12 @@ uv run python -m llm_quiz \
 - `--evaluator-model`: Model for evaluating answers (e.g., `gpt-4o`)
 - `--context-urls`: File containing URLs with course materials (one URL per line)
 
+### Optional Parameters
+
+- `--context-window-size`: Context window size for LLM models (default: 32768)
+- `--output`: Save detailed results to JSON file
+- `--verbose`: Enable detailed logging
+
 ### Example Commands
 
 ```bash
@@ -66,6 +72,15 @@ uv run python -m llm_quiz \
   --evaluator-model gpt-4o \
   --context-urls lecture_urls.txt \
   --verbose
+
+# With custom context window size
+uv run python -m llm_quiz \
+  --quiz-file my_quiz.toml \
+  --api-key sk-or-v1-abc123 \
+  --quiz-model gpt-4o-mini \
+  --evaluator-model gpt-4o \
+  --context-urls lecture_urls.txt \
+  --context-window-size 128000
 ```
 
 ## 📁 File Setup
