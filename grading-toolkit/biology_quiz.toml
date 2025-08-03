@@ -1,0 +1,9 @@
+title = "Biology Quiz"
+
+[[questions]]
+question = "In a symbiotic relationship between mycorrhizal fungi and plant roots, what happens to nutrient transfer efficiency when soil phosphorus levels are extremely high versus extremely low?"
+answer = "When soil phosphorus is extremely high, the plant reduces its investment in mycorrhizal partnerships, leading to decreased nutrient transfer efficiency. When phosphorus is extremely low, the plant increases mycorrhizal investment, but transfer efficiency may still be limited by the absolute scarcity of available nutrients."
+
+[[questions]]
+question = "What is the primary function of mitochondria in eukaryotic cells?"
+answer = "Mitochondria produce ATP through cellular respiration, serving as the powerhouse of the cell."

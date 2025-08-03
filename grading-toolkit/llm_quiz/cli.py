@@ -58,6 +58,9 @@ Examples:
   # Run with default OpenRouter settings
   python -m llm_quiz.cli --quiz-file quiz.toml --api-key sk-or-v1-xxx
 
+  # Run with custom subject area
+  python -m llm_quiz.cli --quiz-file quiz.toml --api-key sk-xxx --subject-area "biology"
+
   # Run with custom Ollama instance
   python -m llm_quiz.cli --quiz-file quiz.toml --base-url http://localhost:11434/v1 --api-key dummy
 
@@ -114,6 +117,12 @@ GitHub Classroom Integration:
         help="Module name for context loading (e.g., m01-euler_tour)"
     )
     
+    parser.add_argument(
+        "--subject-area",
+        default="course materials",
+        help="Subject area for validation (e.g., 'network science', 'biology', 'history')"
+    )
+    
     # Output configuration
     parser.add_argument(
         "--output",
@@ -156,6 +165,7 @@ def main():
         logger.info(f"Base URL: {args.base_url}")
         logger.info(f"Quiz Model: {args.quiz_model}")
         logger.info(f"Evaluator Model: {args.evaluator_model}")
+        logger.info(f"Subject Area: {args.subject_area}")
         if args.module:
             logger.info(f"Module: {args.module}")
         
@@ -164,7 +174,8 @@ def main():
             quiz_model=args.quiz_model,
             evaluator_model=args.evaluator_model,
             api_key=args.api_key,
-            module_name=args.module
+            module_name=args.module,
+            subject_area=args.subject_area
         )
         
         # Load quiz from file
