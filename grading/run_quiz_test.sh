@@ -57,7 +57,7 @@ echo "💾 Output: $OUTPUT"
 # Check if results file exists and if quiz.toml is newer
 if [[ -f "$OUTPUT" ]] && [[ "$QUIZ_FILE" -ot "$OUTPUT" ]]; then
     echo "📁 Results file found and quiz file is not newer - checking if student passed"
-    
+
     # Check if student stumped all LLMs using jq
     if jq -e '.student_passes == true' "$OUTPUT" > /dev/null 2>&1; then
         echo "🎉 STUDENT PASSED: Stumped LLMs in all questions!"
@@ -79,6 +79,7 @@ else
     fi
 fi
 
+
 # Run the quiz grading
 echo "🚀 Starting LLM quiz grading..."
 uv run python -m grading.llm_quiz \
@@ -91,7 +92,7 @@ uv run python -m grading.llm_quiz \
 if [[ -f "$OUTPUT" ]]; then
     echo "✅ Quiz grading completed successfully"
     echo "💾 Results saved to: $OUTPUT"
-    
+
     # Show final result
     if jq -e '.student_passes == true' "$OUTPUT" > /dev/null 2>&1; then
         echo "🎉 FINAL RESULT: Student PASSED!"
