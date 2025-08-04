@@ -63,7 +63,7 @@ elif [[ "$QUIZ_FILE" -nt "$OUTPUT" ]]; then
     rm -f "$OUTPUT"
 else
     echo "📁 Results file found and quiz file is not newer - checking if student passed"
-    
+
     # Check if student stumped all LLMs using jq
     if jq -e '.student_passes == true' "$OUTPUT" > /dev/null 2>&1; then
         echo "🎉 STUDENT PASSED: Stumped LLMs in all questions!"
@@ -72,8 +72,7 @@ else
     else
         echo "❌ STUDENT FAILED: Did not stump LLMs in all questions"
         echo "🗑️ Removing old results file"
-        rm -f "$OUTPUT"
-        echo "🔄 Running grading..."
+        exit 1
     fi
 fi
 
