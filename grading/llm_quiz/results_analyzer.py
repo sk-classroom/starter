@@ -206,6 +206,8 @@ class ResultsAnalyzer:
             winner = "Student" if qr.student_wins else "LLM"
 
             content.extend([
+                " ",
+                " ",
                 f"\n📝 Question {qr.question.number}: {winner_emoji} {winner} wins",
                 "─"*60,
                 f"Question: {qr.question.question}",
