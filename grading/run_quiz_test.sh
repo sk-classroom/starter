@@ -71,7 +71,6 @@ else
         exit 0
     else
         echo "❌ STUDENT FAILED: Did not stump LLMs in all questions"
-        echo "🗑️ Removing old results file"
         exit 1
     fi
 fi
