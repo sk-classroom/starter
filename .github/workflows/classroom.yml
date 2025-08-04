@@ -63,13 +63,22 @@ jobs:
           fi
         timeout: 10
         max-score: 5
-    - name: Upload quiz results
-      uses: actions/upload-artifact@v4
+    - name: Commit and push quiz results
       if: always()
-      with:
-        name: quiz-results
-        path: assignment/quiz_results.json
-        if-no-files-found: ignore
+      run: |
+        if [ -f "./assignment/quiz_results.json" ]; then
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add assignment/quiz_results.json
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Add quiz results from automated grading"
+            git push
+          fi
+        else
+          echo "No quiz results file to commit"
+        fi
     - name: Autograding Reporter
       uses: classroom-resources/autograding-grading-reporter@v1
       env:
