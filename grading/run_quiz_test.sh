@@ -54,10 +54,16 @@ echo "📋 Config: $CONFIG"
 echo "📝 Quiz file: $QUIZ_FILE"
 echo "💾 Output: $OUTPUT"
 
-# Check if results file exists and if quiz.toml is newer
-if [[ -f "$OUTPUT" ]] && [[ "$QUIZ_FILE" -ot "$OUTPUT" ]]; then
+# Check if results file exists and determine what to do
+if [[ ! -f "$OUTPUT" ]]; then
+    echo "📂 No results file found - running LLM quiz for first time"
+elif [[ "$QUIZ_FILE" -nt "$OUTPUT" ]]; then
+    echo "🔄 Quiz file is newer than results - re-running grading"
+    echo "🗑️ Removing old results file"
+    rm -f "$OUTPUT"
+else
     echo "📁 Results file found and quiz file is not newer - checking if student passed"
-
+    
     # Check if student stumped all LLMs using jq
     if jq -e '.student_passes == true' "$OUTPUT" > /dev/null 2>&1; then
         echo "🎉 STUDENT PASSED: Stumped LLMs in all questions!"
@@ -68,14 +74,6 @@ if [[ -f "$OUTPUT" ]] && [[ "$QUIZ_FILE" -ot "$OUTPUT" ]]; then
         echo "🗑️ Removing old results file"
         rm -f "$OUTPUT"
         echo "🔄 Running grading..."
-    fi
-else
-    if [[ -f "$OUTPUT" ]]; then
-        echo "🔄 Quiz file is newer than results - re-running grading"
-        echo "🗑️ Removing old results file"
-        rm -f "$OUTPUT"
-    else
-        echo "📂 No results file found - running LLM quiz for first time"
     fi
 fi
 
