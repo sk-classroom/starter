@@ -275,7 +275,7 @@ def calc_square(x):
     Output:
         numpy array. The square of the input.
     """
-    return x ** 2
+    return x
 
 @app.cell(hide_code=True)
 def _(mo):
