@@ -14,24 +14,23 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Check previous run status
-      id: check_previous
-      run: |
-        PREVIOUS_RUN=$(gh run list --workflow="Autograding Tests" --status=success --limit=1 --json headSha | jq -r '.[0].headSha // empty')
-        CURRENT_SHA=${{ github.sha }}
-        if [ "$PREVIOUS_RUN" = "$CURRENT_SHA" ]; then
-          echo "skip=true" >> $GITHUB_OUTPUT
-          echo "Tests already passed for this commit"
-        else
-          echo "skip=false" >> $GITHUB_OUTPUT
-        fi
-      env:
-        GH_TOKEN: ${{ github.token }}
+    - name: Cache Task 1 results
+      uses: actions/cache@v3
+      id: task1-cache
+      with:
+        path: .test-cache/task1
+        key: task1-${{ hashFiles('tests/test_01.py') }}-${{ github.sha }}
 
+    - name: Cache Task 2 results
+      uses: actions/cache@v3
+      id: task2-cache
+      with:
+        path: .test-cache/task2
+        key: task2-${{ hashFiles('assignment/quiz.toml') }}-${{ github.sha }}
 
     - name: Task 1
       id: task-1
-      if: steps.check_previous.outputs.skip != 'true'
+      if: steps.task1-cache.outputs.cache-hit != 'true'
       uses: classroom-resources/autograding-command-grader@v1
       with:
         test-name: Assignment - Test 1
@@ -46,9 +45,15 @@ jobs:
         timeout: 10
         max-score: 5
 
+    - name: Save Task 1 success
+      if: steps.task-1.outputs.result == 'success'
+      run: |
+        mkdir -p .test-cache/task1
+        echo "passed" > .test-cache/task1/status
+
     - name: Test 2
       id: test-2
-      if: steps.check_previous.outputs.skip != 'true'
+      if: steps.task2-cache.outputs.cache-hit != 'true'
       uses: classroom-resources/autograding-command-grader@v1
       with:
         test-name: Quiz Challenge
@@ -61,11 +66,17 @@ jobs:
         timeout: 10
         max-score: 5
 
+    - name: Save Task 2 success
+      if: steps.test-2.outputs.result == 'success'
+      run: |
+        mkdir -p .test-cache/task2
+        echo "passed" > .test-cache/task2/status
     - name: Autograding Reporter
-      if: steps.check_previous.outputs.skip != 'true'
       uses: classroom-resources/autograding-grading-reporter@v1
       env:
         TASK-1_RESULTS: "${{steps.task-1.outputs.result}}"
         TEST-2_RESULTS: "${{steps.test-2.outputs.result}}"
       with:
         runners: task-1,test-2
+
+
