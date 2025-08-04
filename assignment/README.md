@@ -1,125 +1,55 @@
-# Quiz Assignment: Challenge the AI
+# Assignment Tasks
 
-## 🎯 Objective
 
-Your goal is to create challenging quiz questions that can **stump an AI** (Large Language Model). You need to demonstrate deep understanding of course concepts by crafting questions that test edge cases, subtle distinctions, and require multi-step reasoning.
+This assignment requires you to complete two main tasks and submit your work to GitHub. You will need to implement Python functions marked with special comments and create a quiz file with challenging questions that test your understanding of course concepts.
 
-## 📋 Requirements
+## Task 1: Function Implementation
 
-### ✅ To Pass This Assignment:
-1. **Submit at least 1 valid question** (passes validation)
-2. **Achieve 100% win rate** - stump the LLM on ALL your valid questions
 
-### 📝 Question Format (REQUIRED):
-Use **TOML format** for all questions:
+<p align="center">
+  <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgDC8T-6_7wMK9PWpXbRm7FUU2iMMhvAE0YFYX9RcA4PXLGNDJJFW6anUa4tBtIj42AFVQFwI0BN7i4gWNu9ZGcgE-tdx6dbKzvrORIVB9AEyjjdTDkKG4StslIvz8wkHiTiEKORptbXB54/s1600/computer_screen_programming.png" alt="Quiz Dojo" width="30%"/>
+</p>
 
+Your first task involves working with the `assignment.py` file using the marimo notebook interface. Throughout this file, you will find functions that are marked with `#TASK` comments in their docstrings. These functions contain placeholder implementations that you need to replace with working code. Each function includes a detailed docstring that specifies the expected input parameters and return values.
+
+## Task 2: Quiz Creation
+
+
+<p align="center">
+  <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjlHKrBdBIO7hyuXygw_c4F1vwztHkr9cu9Rssl8c6SDEMBAJzYxsJe2IJsDqgLKU6Qx7GJRBlYqI0zvpbD_LdDbCbux_L3GSjQGX6PhHSYv8nf7-QdO4yjVMTQZr25TfnAwRnOt7NG9l4/s180-c/samurai_kettou.png" alt="Quiz Dojo" width="30%"/>
+</p>
+
+Your second task is to create a `quiz.toml` file with exactly two challenging questions about the course material. Here’s the twist: your quiz will be taken by a large language model, not just a human grader. If you can write a question that the LLM gets wrong, you’ll pass this part of the assignment!
+
+To succeed, craft questions that are subtle, require deep understanding, or test tricky edge cases—something that might trip up even a smart AI. Each question should be clearly written in TOML format (see below), and must include a complete, correct answer. Aim for questions that go beyond surface-level facts and require careful reasoning or attention to detail.
+
+**Required format for quiz.toml:**
 ```toml
 [[questions]]
-question = "Your challenging question here?"
-answer = "Complete and accurate answer here."
+question = "Your first challenging question?"
+answer = "Complete and accurate answer."
 
 [[questions]]
-question = "Another question if you want multiple?"
-answer = "Another complete answer."
+question = "Your second challenging question?"
+answer = "Complete and accurate answer."
 ```
 
-## 📁 Files to Submit
+**Donts:**
+- Do not include heavy mathematical derivations or off-topic content in your quiz questions.
+- Do not explicitly instruct the LLM to answer incorrectly.
 
-### `quiz.toml` (Required)
-This is your main submission file containing your challenging questions. Replace the example questions with your own.
+## Submission Process
 
-**Example Structure:**
-```toml
-[[questions]]
-question = "What specific conditions must be met for this fundamental theorem to apply in disconnected structures?"
-answer = "A disconnected structure cannot satisfy the theorem. The theorem requires connectivity as a fundamental prerequisite, regardless of other properties."
+Once you have completed both tasks, you need to upload your work to your GitHub repository. Use the standard git command or alternatively web interface. See [how to upload your assingment](https://docs.google.com/presentation/d/19Zvrp5kha6ohF4KvTX9W2jodKkfmsOrJfEZtO_Wg0go)
 
-[[questions]]
-question = "In this type of system with parameter γ=2.1, what happens to stability when you remove the top 1% highest-ranked elements versus removing 10% random elements?"
-answer = "Removing the top 1% highest-ranked elements causes catastrophic failure due to the power-law distribution, while removing 10% random elements has minimal impact since most elements have very low rank."
-```
+GitHub Classroom will automatically detect your submission and begin the grading process.
 
-## 🎯 Creating Challenging Questions
 
-### ✅ Question Types That Stump LLMs:
-- **Edge cases and exceptions** (disconnected structures, empty sets, boundary conditions)
-- **Subtle distinctions** between similar concepts (related terms, measurement methods)
-- **Multi-constraint scenarios** (combine multiple course properties)
-- **Counterintuitive examples** (paradoxes and edge cases)
-- **Failure modes** (when do algorithms or theories break down?)
-- **Parameter-specific behavior** (what happens at specific values?)
+**Tips:**: It is tiresome to go back and forth between the file and the report in GitHub Actions. To save your time, prepare two web browsers side by side, one for the file and one for the GitHub Actions Report. If you are using VSCode, [GitHubAction extension is a good choice](https://open-vsx.org/extension/GitHub/vscode-github-actions).
 
-### ❌ Question Types LLMs Handle Easily:
-- Basic definitions ("What is this concept?")
-- Standard textbook examples
-- General conceptual explanations
-- Simple algorithmic steps
-- Obvious keyword-based questions
 
-### 💡 Pro Tips:
-1. **Be specific** - Ask about specific parameter ranges, edge cases, or conditions
-2. **Test understanding** - Don't just ask for definitions
-3. **Use constraints** - Combine multiple course properties in one question
-4. **Think critically** - What would confuse even a smart student?
-5. **Validate locally** - Test your questions with the grading tool first
+## Grading and Requirements
 
-## 🔧 Testing Your Questions
+Your submission will be automatically graded using GitHub Actions. The grading system will test your function implementations for correctness and validate your quiz questions for relevance to the course material. All functions marked with `#TASK` must be implemented correctly to pass the function portion of the assignment. Your quiz must contain exactly two questions in the proper TOML format, and the questions should be challenging but directly related to course concepts.
 
-Before submitting, you can test your questions using the grading tool:
-- Run the quiz challenge locally with your questions
-- See how the AI performs on each question
-- Check validation feedback and adjust accordingly
-- Refine based on evaluation results
-
-## ⚠️ Validation Rules
-
-Your questions will be automatically validated for:
-- ✅ **Relevance** to course subject area
-- ❌ **Heavy math** (no complex derivations or extensive calculations)
-- ❌ **Off-topic content** (must relate to course materials)
-- ❌ **Prompt injection** (no attempts to manipulate the AI system)
-- ✅ **Answer quality** (your answers must be accurate and complete)
-
-## 📊 Grading
-
-### Automatic Grading Process:
-1. **Validation** - Questions checked for appropriateness
-2. **AI Challenge** - LLM attempts to answer your questions
-3. **Evaluation** - Expert LLM judges correctness
-4. **Pass/Fail** - Based on 100% win rate requirement
-
-### Grade Markers:
-- **PASS**: `STUDENTS_QUIZ_KEIKO_WIN`
-- **FAIL**: `STUDENTS_QUIZ_KEIKO_LOSE`
-
-### Common Failure Reasons:
-- Questions too easy for the LLM
-- Invalid questions (off-topic, heavy math, etc.)
-- Incorrect or incomplete answers
-- Wrong file format (not using TOML)
-
-## 🚀 Getting Started
-
-1. **Study the modules** - Review course materials for concepts to challenge
-2. **Edit `quiz.toml`** - Replace example questions with your challenging ones
-3. **Test locally** - Use the Quiz Creator Dojo to refine your questions
-4. **Submit** - Push your `quiz.toml` file
-5. **Check results** - GitHub Classroom will show PASS/FAIL status
-
-## 💯 Success Strategy
-
-Focus on creating questions that require **deep understanding** rather than memorization:
-- Find edge cases in algorithms or theorems
-- Explore parameter sensitivity in course models
-- Challenge assumptions about course properties
-- Test knowledge of when methods fail or don't apply
-
-Remember: Your goal is to demonstrate mastery by creating questions that challenge even an advanced AI system!
-
-## 🆘 Need Help?
-
-- **Technical Issues**: Check the grading tool documentation and error messages
-- **Content Questions**: Review course materials and lecture notes
-- **Format Problems**: Follow the TOML examples exactly as shown above
-
-Good luck creating questions that stump the AI! 🤖⚔️
+**Important Note on Final Grading:** The final grade shown in GitHub Actions will be taken as your final grade for this assignment. The quiz evaluation process can be stochastic, meaning that different evaluation runs may lead to slightly different results due to the AI's variability. However, if you create a well-crafted question with a correct answer, the impact of this variability is negligible. Your goal should be to create questions that are so cleverly designed that the LLM consistently gets them wrong, regardless of minor variations in the evaluation process.
