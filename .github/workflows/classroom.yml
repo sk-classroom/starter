@@ -35,8 +35,8 @@ jobs:
         test-name: Quiz Challenge
         setup-command: ''
         command: |
-          uv run python -m grading-toolkit.llm_quiz \
-            --config ./grading-toolkit/config.toml \
+          uv run python -m grading.llm_quiz \
+            --config ./grading/config.toml \
             --quiz-file ./assignment/quiz.toml \
             --api-key ${{ secrets.CHAT_API }}
         timeout: 10
