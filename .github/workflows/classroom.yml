@@ -18,7 +18,13 @@ jobs:
       uses: classroom-resources/autograding-command-grader@v1
       with:
         test-name: Assignment - Test 1
-        setup-command: pip install -r requirements.txt
+        setup-command: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          export PATH="$HOME/.cargo/bin:$PATH"
+          uv venv
+          source .venv/bin/activate
+          . $HOME/.cargo/env
+          uv pip install -r requirements.txt
         command: uv run tests/test_01.py
         timeout: 10
         max-score: 5
@@ -28,25 +34,14 @@ jobs:
       with:
         test-name: Quiz Challenge
         setup-command: ''
-        command: uv run llm_quiz_grading.py --quiz-file ./quiz.toml --output test_results.json  --quiz-model "llama3.2:latest" --module m01-euler_tour
-        timeout: 10
-        max-score: 5
-    - name: Task 3
-      id: task-3
-      uses: classroom-resources/autograding-command-grader@v1
-      with:
-        test-name: Task 3
-        setup-command: ''
-        command: bash grading-toolkit/grade_notebook.sh tests/test_03.py assignment/assignment.ipynb
-        timeout: 10
-        max-score: 5
-    - name: Task 4
-      id: task-4
-      uses: classroom-resources/autograding-command-grader@v1
-      with:
-        test-name: Task 4
-        setup-command: ''
-        command: bash grading-toolkit/grade_notebook.sh tests/test_04.py assignment/assignment.ipynb
+        command: |
+          uv run python -m llm_quiz \
+            --quiz-file ./assignment/quiz.toml \
+            --api-key ${{ secrets.CHAT_API }} \
+            --base-url https://api.openrouter.ai/v1 \
+            --quiz-model google/gemma-3-4b-it \
+            --evaluator-model google/gemini-2.5-flash-lite
+            --context-urls ./grading-toolkit/context_urls.txt
         timeout: 10
         max-score: 5
     - name: Autograding Reporter
@@ -57,5 +52,5 @@ jobs:
         TASK-3_RESULTS: "${{steps.task-3.outputs.result}}"
         TASK-4_RESULTS: "${{steps.task-4.outputs.result}}"
       with:
-        runners: task-1,test-2,task-3,task-4
+        runners: task-1,test-2
 

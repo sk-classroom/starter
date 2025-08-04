@@ -1,14 +1,2 @@
-# Example context URLs file for LLM Quiz Challenge
-# Lines starting with # are comments and will be ignored
-# Add one URL per line
-
-# Example GitHub raw file URLs
-# https://raw.githubusercontent.com/user/repo/main/lecture-01.md
-# https://raw.githubusercontent.com/user/repo/main/exercises-01.py
-
-# Example documentation URLs  
-# https://docs.example.com/course-materials/chapter1.html
-# https://university.edu/courses/bio101/notes.md
-
-# Example API endpoints returning text content
-# https://api.example.com/materials/text-content
+https://raw.githubusercontent.com/skojaku/adv-net-sci/refs/heads/main/docs/lecture-note/m01-euler_tour/01-concepts.qmd
+https://raw.githubusercontent.com/skojaku/adv-net-sci/refs/heads/main/docs/lecture-note/m01-euler_tour/01-advanced.qmd
