@@ -33,12 +33,31 @@ jobs:
       uses: classroom-resources/autograding-command-grader@v1
       with:
         test-name: Quiz Challenge
-        setup-command: ''
+        setup-command: 'sudo apt-get update && sudo apt-get install -y jq'
         command: |
-          uv run python -m grading.llm_quiz \
-            --config ./grading/config.toml \
-            --quiz-file ./assignment/quiz.toml \
-            --api-key ${{ secrets.CHAT_API }}
+          # Check if results file exists
+          if [ -f "./assignment/quiz_results.json" ]; then
+            echo "Results file found - checking if student passed"
+            # Check if student stumped all LLMs using jq
+            if jq -e '.student_passes == true' "./assignment/quiz_results.json" > /dev/null; then
+              echo "STUDENT PASSED: Stumped LLMs in all questions!"
+              exit 0
+            else
+              echo "STUDENT FAILED: Did not stump LLMs in all questions"
+              # Run grading
+              uv run python -m grading.llm_quiz \
+                --config ./grading/config.toml \
+                --quiz-file ./assignment/quiz.toml \
+                --api-key ${{ secrets.CHAT_API }}
+            fi
+          else
+            echo "No results file found - running LLM quiz"
+            # Run grading
+            uv run python -m grading.llm_quiz \
+              --config ./grading/config.toml \
+              --quiz-file ./assignment/quiz.toml \
+              --api-key ${{ secrets.CHAT_API }}
+          fi
         timeout: 10
         max-score: 5
     - name: Autograding Reporter

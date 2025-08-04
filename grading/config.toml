@@ -24,7 +24,7 @@ urls = [
 
 [output]
 # Output configuration
-results_file = "quiz_results.json"  # Default output file for results
+results_file = "./assignment/quiz_results.json"  # Default output file for results
 verbose = false                     # Enable verbose logging
 
 # Example usage:
