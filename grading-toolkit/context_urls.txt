@@ -1,2 +1,0 @@
-https://raw.githubusercontent.com/skojaku/adv-net-sci/refs/heads/main/docs/lecture-note/m01-euler_tour/01-concepts.qmd
-https://raw.githubusercontent.com/skojaku/adv-net-sci/refs/heads/main/docs/lecture-note/m01-euler_tour/04-advanced.qmd
