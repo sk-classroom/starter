@@ -13,24 +13,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
-    - name: Cache Task 1 results
-      uses: actions/cache@v3
-      id: task1-cache
-      with:
-        path: .test-cache/task1
-        key: task1-${{ hashFiles('tests/test_01.py') }}-${{ github.sha }}
-
-    - name: Cache Task 2 results
-      uses: actions/cache@v3
-      id: task2-cache
-      with:
-        path: .test-cache/task2
-        key: task2-${{ hashFiles('assignment/quiz.toml') }}-${{ github.sha }}
-
     - name: Task 1
       id: task-1
-      if: steps.task1-cache.outputs.cache-hit != 'true'
       uses: classroom-resources/autograding-command-grader@v1
       with:
         test-name: Assignment - Test 1
@@ -44,16 +28,8 @@ jobs:
         command: uv run tests/test_01.py
         timeout: 10
         max-score: 5
-
-    - name: Save Task 1 success
-      if: steps.task-1.outputs.result == 'success'
-      run: |
-        mkdir -p .test-cache/task1
-        echo "passed" > .test-cache/task1/status
-
     - name: Test 2
       id: test-2
-      if: steps.task2-cache.outputs.cache-hit != 'true'
       uses: classroom-resources/autograding-command-grader@v1
       with:
         test-name: Quiz Challenge
@@ -65,12 +41,6 @@ jobs:
             --api-key ${{ secrets.CHAT_API }}
         timeout: 10
         max-score: 5
-
-    - name: Save Task 2 success
-      if: steps.test-2.outputs.result == 'success'
-      run: |
-        mkdir -p .test-cache/task2
-        echo "passed" > .test-cache/task2/status
     - name: Autograding Reporter
       uses: classroom-resources/autograding-grading-reporter@v1
       env:
@@ -78,5 +48,3 @@ jobs:
         TEST-2_RESULTS: "${{steps.test-2.outputs.result}}"
       with:
         runners: task-1,test-2
-
-
