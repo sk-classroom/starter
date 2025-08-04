@@ -1,6 +1,6 @@
 [[questions]]
 question = "What is an Euler path?"
-answer = "A path that visits every edge exactly once."
+answer = "A path that visit every edge exactly once."
 
 [[questions]]
 question = "What is an Euler circuit?"

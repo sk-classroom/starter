@@ -54,24 +54,55 @@ echo "📋 Config: $CONFIG"
 echo "📝 Quiz file: $QUIZ_FILE"
 echo "💾 Output: $OUTPUT"
 
+# Function to extract questions and answers from TOML file
+extract_toml_content() {
+    python3 -c "
+import tomllib
+import json
+import sys
+
+try:
+    with open('$1', 'rb') as f:
+        data = tomllib.load(f)
+    # Create a sorted list of question-answer pairs
+    qa_pairs = sorted([(q.get('question', ''), q.get('answer', '')) for q in data.get('questions', [])])
+    print(json.dumps(qa_pairs, separators=(',', ':')))
+except Exception as e:
+    print('[]', file=sys.stderr)
+    sys.exit(1)
+"
+}
+
 # Check if results file exists and determine what to do
 if [[ ! -f "$OUTPUT" ]]; then
     echo "📂 No results file found - running LLM quiz for first time"
-elif [[ "$QUIZ_FILE" -nt "$OUTPUT" ]]; then
-    echo "🔄 Quiz file is newer than results - re-running grading"
-    echo "🗑️ Removing old results file"
-    rm -f "$OUTPUT"
 else
-    echo "📁 Results file found and quiz file is not newer - checking if student passed"
+    echo "📁 Results file found - checking if quiz content has changed"
 
-    # Check if student stumped all LLMs using jq
-    if jq -e '.student_passes == true' "$OUTPUT" > /dev/null 2>&1; then
-        echo "🎉 STUDENT PASSED: Stumped LLMs in all questions!"
-        echo "✅ Skipping grading and awarding full points"
-        exit 0
+    # Extract current questions and answers from TOML file
+    CURRENT_CONTENT=$(extract_toml_content "$QUIZ_FILE")
+
+    # Extract questions and answers from stored results
+    STORED_CONTENT=$(jq -c '[.question_results[] | [.question, .correct_answer]] | sort' "$OUTPUT" 2>/dev/null || echo "[]")
+    echo "📝 Previous content: $STORED_CONTENT"
+    echo "📝 Current content: $CURRENT_CONTENT"
+
+    if [[ "$CURRENT_CONTENT" != "$STORED_CONTENT" ]]; then
+        echo "🔄 Quiz content has changed - re-running grading"
+        echo "🗑️ Removing old results file"
+        rm -f "$OUTPUT"
     else
-        echo "❌ STUDENT FAILED: Did not stump LLMs in all questions"
-        exit 1
+        echo "📋 Quiz content unchanged - checking if student passed"
+
+        # Check if student stumped all LLMs using jq
+        if jq -e '.student_passes == true' "$OUTPUT" > /dev/null 2>&1; then
+            echo "🎉 STUDENT PASSED: Stumped LLMs in all questions!"
+            echo "✅ Skipping grading and awarding full points"
+            exit 0
+        else
+            echo "❌ STUDENT FAILED: Did not stump LLMs in all questions"
+            exit 1
+        fi
     fi
 fi
 
