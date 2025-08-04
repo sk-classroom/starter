@@ -38,7 +38,7 @@ jobs:
           uv run python -m grading-toolkit.llm_quiz \
             --quiz-file ./assignment/quiz.toml \
             --api-key ${{ secrets.CHAT_API }} \
-            --base-url https://api.openrouter.ai/v1 \
+            --base-url https://openrouter.ai/api/v1 \
             --quiz-model google/gemma-3-4b-it \
             --evaluator-model google/gemini-2.5-flash-lite
             --context-urls ./grading-toolkit/context_urls.txt
