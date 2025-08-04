@@ -44,19 +44,22 @@ jobs:
               exit 0
             else
               echo "STUDENT FAILED: Did not stump LLMs in all questions"
-              # Run grading
+              rm -f "./assignment/quiz_results.json"
+              # Run grading and save results if successful
               uv run python -m grading.llm_quiz \
                 --config ./grading/config.toml \
                 --quiz-file ./assignment/quiz.toml \
-                --api-key ${{ secrets.CHAT_API }}
+                --api-key ${{ secrets.CHAT_API }} \
+                --output "./assignment/quiz_results.json"
             fi
           else
             echo "No results file found - running LLM quiz"
-            # Run grading
+            # Run grading and save results if successful
             uv run python -m grading.llm_quiz \
               --config ./grading/config.toml \
               --quiz-file ./assignment/quiz.toml \
-              --api-key ${{ secrets.CHAT_API }}
+              --api-key ${{ secrets.CHAT_API }} \
+              --output "./assignment/quiz_results.json"
           fi
         timeout: 10
         max-score: 5
