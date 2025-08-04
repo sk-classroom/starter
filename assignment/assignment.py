@@ -268,7 +268,7 @@ def _(mo):
 @app.function
 def calc_square(x):
     """
-    #Task: Implement the function
+    #TASK: Implement the function
 
     Input:
         x: numpy array
