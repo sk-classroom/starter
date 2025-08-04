@@ -123,17 +123,17 @@ class ResultsAnalyzer:
             "="*80,
             "LLM QUIZ CHALLENGE RESULTS",
             "="*80,
-            "",
+            " ",
             f"Quiz: {results.quiz_title}",
-            "",
+            " ",
             f"Quiz Model: {results.quiz_model}",
-            "",
+            " ",
             f"Evaluator Model: {results.evaluator_model}",
-            "",
+            " ",
             f"Total Questions: {results.total_questions}",
-            "",
+            " ",
             f"Valid Questions: {results.valid_questions}",
-            "",
+            " ",
         ]
 
         if results.invalid_questions > 0:
@@ -144,11 +144,11 @@ class ResultsAnalyzer:
         content.extend([
             "",
             f"Student Wins: {results.student_wins}",
-            "",
+            " ",
             f"LLM Wins: {results.llm_wins}",
-            "",
+            " ",
             f"Student Success Rate: {results.student_success_rate:.1%}"
-            "",
+            " ",
         ])
 
         # Add pass/fail indicator
@@ -176,10 +176,10 @@ class ResultsAnalyzer:
                     f"\n❌ Question {qr.question.number}: INVALID",
                     "─"*60,
                     f"Question: {qr.question.question}",
-                    "",
+                    " ",
                     f"🚫 Validation Issues:",
                     f"   {qr.question.validation_result.reason}",
-                    "",
+                    " ",
                     "❌ Question: Invalid",
                     ""
                 ])
@@ -193,10 +193,10 @@ class ResultsAnalyzer:
                     f"\n⚠️  Question {qr.question.number}: SYSTEM ERROR",
                     "─"*60,
                     f"Question: {qr.question.question}",
-                    "",
+                    " ",
                     f"🔧 System Issues:",
                     f"   {qr.evaluation_explanation}",
-                    "",
+                    " ",
                     f"⚠️  Result: This question was not counted due to system errors.",
                     ""
                 ])
@@ -209,17 +209,17 @@ class ResultsAnalyzer:
                 f"\n📝 Question {qr.question.number}: {winner_emoji} {winner} wins",
                 "─"*60,
                 f"Question: {qr.question.question}",
-                "",
+                " ",
                 f"💡 Your Expected Answer:",
                 f"{qr.question.answer}",
-                "",
+                " ",
                 f"🤖 LLM's Answer:",
                 f"{qr.llm_answer}",
-                "",
+                " ",
                 f"⚖️  Evaluator's Verdict: {'CORRECT' if qr.is_correct else 'INCORRECT'}",
-                "",
+                " ",
                 f"📝 Evaluation: {qr.evaluation_explanation}",
-                ""
+                " "
             ])
 
             # Show validation status for valid questions
