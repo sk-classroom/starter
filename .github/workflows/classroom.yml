@@ -35,7 +35,7 @@ jobs:
         test-name: Quiz Challenge
         setup-command: ''
         command: |
-          uv run python -m llm_quiz \
+          uv run python -m grading-toolkit.llm_quiz \
             --quiz-file ./assignment/quiz.toml \
             --api-key ${{ secrets.CHAT_API }} \
             --base-url https://api.openrouter.ai/v1 \
