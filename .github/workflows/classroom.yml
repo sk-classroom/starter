@@ -13,8 +13,24 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+
+    - name: Check previous run status
+      id: check_previous
+      run: |
+        PREVIOUS_RUN=$(gh run list --workflow="Autograding Tests" --status=success --limit=1 --json headSha | jq -r '.[0].headSha // empty')
+        CURRENT_SHA=${{ github.sha }}
+        if [ "$PREVIOUS_RUN" = "$CURRENT_SHA" ]; then
+          echo "skip=true" >> $GITHUB_OUTPUT
+          echo "Tests already passed for this commit"
+        else
+          echo "skip=false" >> $GITHUB_OUTPUT
+        fi
+      env:
+        GH_TOKEN: ${{ github.token }}
+
     - name: Task 1
       id: task-1
+      if: steps.check_previous.outputs.skip != 'true'
       uses: classroom-resources/autograding-command-grader@v1
       with:
         test-name: Assignment - Test 1
@@ -28,8 +44,10 @@ jobs:
         command: uv run tests/test_01.py
         timeout: 10
         max-score: 5
+
     - name: Test 2
       id: test-2
+      if: steps.check_previous.outputs.skip != 'true'
       uses: classroom-resources/autograding-command-grader@v1
       with:
         test-name: Quiz Challenge
@@ -41,12 +59,12 @@ jobs:
             --api-key ${{ secrets.CHAT_API }}
         timeout: 10
         max-score: 5
+
     - name: Autograding Reporter
+      if: steps.check_previous.outputs.skip != 'true'
       uses: classroom-resources/autograding-grading-reporter@v1
       env:
         TASK-1_RESULTS: "${{steps.task-1.outputs.result}}"
         TEST-2_RESULTS: "${{steps.test-2.outputs.result}}"
       with:
         runners: task-1,test-2
-
-
