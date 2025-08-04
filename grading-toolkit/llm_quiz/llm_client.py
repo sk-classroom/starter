@@ -161,7 +161,8 @@ class LLMClient:
             )
     
     def simple_chat(self, prompt: str, model: str, system_message: Optional[str] = None, 
-                   temperature: float = 0.1, max_tokens: int = 500) -> LLMResponse:
+                   temperature: float = 0.1, max_tokens: int = 500, 
+                   response_format: Optional[Dict[str, Any]] = None) -> LLMResponse:
         """Simplified interface for single-prompt chat requests.
         
         Args:
@@ -170,6 +171,7 @@ class LLMClient:
             system_message: Optional system message
             temperature: Sampling temperature
             max_tokens: Maximum tokens in response
+            response_format: Optional structured output format (for JSON schema)
             
         Returns:
             LLM response
@@ -181,11 +183,16 @@ class LLMClient:
         
         messages.append(LLMMessage(role="user", content=prompt))
         
+        extra_params = {}
+        if response_format:
+            extra_params["response_format"] = response_format
+            
         request = LLMRequest(
             messages=messages,
             model=model,
             temperature=temperature,
-            max_tokens=max_tokens
+            max_tokens=max_tokens,
+            extra_params=extra_params
         )
         
         return self.chat(request)

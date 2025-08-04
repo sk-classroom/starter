@@ -36,12 +36,9 @@ jobs:
         setup-command: ''
         command: |
           uv run python -m grading-toolkit.llm_quiz \
+            --config ./grading-toolkit/config.toml \
             --quiz-file ./assignment/quiz.toml \
-            --api-key ${{ secrets.CHAT_API }} \
-            --base-url https://openrouter.ai/api/v1 \
-            --quiz-model google/gemma-3-4b-it \
-            --evaluator-model google/gemini-2.5-flash-lite
-            --context-urls ./grading-toolkit/context_urls.txt
+            --api-key ${{ secrets.CHAT_API }}
         timeout: 10
         max-score: 5
     - name: Autograding Reporter
@@ -49,8 +46,6 @@ jobs:
       env:
         TASK-1_RESULTS: "${{steps.task-1.outputs.result}}"
         TEST-2_RESULTS: "${{steps.test-2.outputs.result}}"
-        TASK-3_RESULTS: "${{steps.task-3.outputs.result}}"
-        TASK-4_RESULTS: "${{steps.task-4.outputs.result}}"
       with:
         runners: task-1,test-2
 

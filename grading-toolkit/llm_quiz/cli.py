@@ -9,23 +9,107 @@ import argparse
 import sys
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Dict, Any
+
+try:
+    import tomllib  # Python 3.11+ built-in TOML parser
+except ImportError:
+    import tomli as tomllib  # Fallback for Python < 3.11
 
 from .challenge import LLMQuizChallenge
 
 logger = logging.getLogger(__name__)
 
 
+def load_config(config_file: Path) -> Dict[str, Any]:
+    """Load configuration from TOML file.
+    
+    Args:
+        config_file: Path to TOML configuration file
+        
+    Returns:
+        Dictionary with configuration parameters
+    """
+    try:
+        with open(config_file, 'rb') as f:
+            config = tomllib.load(f)
+        
+        logger.info(f"Loaded configuration from {config_file}")
+        return config
+    except FileNotFoundError:
+        print(f"Error: Configuration file not found: {config_file}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error loading configuration file {config_file}: {e}")
+        sys.exit(1)
+
+
+def merge_config_with_args(args, config: Dict[str, Any]) -> None:
+    """Merge configuration file values with command line arguments.
+    
+    Command line arguments take precedence over config file values.
+    
+    Args:
+        args: Parsed command line arguments
+        config: Configuration dictionary from TOML file
+    """
+    # API configuration
+    api_config = config.get('api', {})
+    if args.base_url == "https://openrouter.ai/api/v1" and 'base_url' in api_config:
+        args.base_url = api_config['base_url']
+    
+    # Model configuration  
+    models_config = config.get('models', {})
+    if not hasattr(args, 'quiz_model') or args.quiz_model == 'gpt-4o-mini':
+        args.quiz_model = models_config.get('quiz_model', 'gpt-4o-mini')
+    if not hasattr(args, 'evaluator_model') or args.evaluator_model == 'gpt-4o':
+        args.evaluator_model = models_config.get('evaluator_model', 'gpt-4o')
+    
+    # Parameters configuration
+    params_config = config.get('parameters', {})
+    if not hasattr(args, 'context_window_size') or args.context_window_size == 32768:
+        args.context_window_size = params_config.get('context_window_size', 32768)
+    if not hasattr(args, 'max_tokens') or args.max_tokens == 500:
+        args.max_tokens = params_config.get('max_tokens', 500)
+    
+    # Context configuration
+    context_config = config.get('context', {})
+    if not args.context_urls and 'urls' in context_config:
+        # Convert URLs list to temporary file for compatibility
+        urls = context_config['urls']
+        if urls:
+            import tempfile
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+                for url in urls:
+                    f.write(f"{url}\n")
+                args.context_urls = f.name
+                args._temp_context_file = f.name  # Track for cleanup
+    
+    # Output configuration
+    output_config = config.get('output', {})
+    if not args.output and 'results_file' in output_config:
+        args.output = Path(output_config['results_file'])
+    if not args.verbose and output_config.get('verbose', False):
+        args.verbose = True
+
+
 def setup_logging(verbose: bool = False):
     """Set up logging configuration."""
-    level = logging.DEBUG if verbose else logging.INFO
-    logging.basicConfig(
-        level=level,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.StreamHandler(sys.stdout)
-        ]
-    )
+    if verbose:
+        level = logging.DEBUG
+        logging.basicConfig(
+            level=level,
+            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            handlers=[
+                logging.StreamHandler(sys.stdout)
+            ]
+        )
+    else:
+        # Hide all log messages by setting level to CRITICAL
+        logging.basicConfig(
+            level=logging.CRITICAL,
+            handlers=[logging.NullHandler()]
+        )
 
 
 def validate_arguments(args) -> bool:
@@ -70,6 +154,12 @@ Examples:
   # Save results and show verbose output
   python -m llm_quiz.cli --quiz-file quiz.toml --api-key sk-xxx --output results.json --verbose
 
+  # Use custom max tokens for longer responses
+  python -m llm_quiz.cli --quiz-file quiz.toml --api-key sk-xxx --max-tokens 1000
+
+  # Use configuration file for parameters and context
+  python -m llm_quiz.cli --quiz-file quiz.toml --api-key sk-xxx --config config.toml
+
 GitHub Classroom Integration:
   - Exit code 0: Student passes (100% win rate on valid questions)
   - Exit code 1: Student fails (less than 100% win rate or no valid questions)
@@ -83,6 +173,12 @@ GitHub Classroom Integration:
         type=Path,
         required=True,
         help="Path to TOML quiz file containing questions and answers"
+    )
+    
+    parser.add_argument(
+        "--config",
+        type=Path,
+        help="Path to TOML configuration file with parameters and context URLs"
     )
     
     parser.add_argument(
@@ -124,6 +220,13 @@ GitHub Classroom Integration:
         help="Context window size for LLM models (default: 32768)"
     )
     
+    parser.add_argument(
+        "--max-tokens",
+        type=int,
+        default=500,
+        help="Maximum tokens in LLM response (default: 500)"
+    )
+    
     # Output configuration
     parser.add_argument(
         "--output",
@@ -153,6 +256,11 @@ def main():
     parser = create_parser()
     args = parser.parse_args()
     
+    # Load configuration file if provided
+    if args.config:
+        config = load_config(args.config)
+        merge_config_with_args(args, config)
+    
     # Set up logging
     setup_logging(args.verbose)
     
@@ -175,7 +283,8 @@ def main():
             base_url=args.base_url,
             quiz_model=args.quiz_model,
             evaluator_model=args.evaluator_model,
-            context_window_size=args.context_window_size
+            context_window_size=args.context_window_size,
+            max_tokens=args.max_tokens
         )
         
         # Load context if provided
@@ -200,20 +309,31 @@ def main():
         # Exit with appropriate code for GitHub Classroom
         if args.exit_on_fail and not results.student_passes:
             logger.info("Student did not pass grading criteria")
-            sys.exit(1)
+            exit_code = 1
         else:
             logger.info("Quiz challenge completed successfully")
-            sys.exit(0)
+            exit_code = 0
             
     except KeyboardInterrupt:
         logger.info("Quiz challenge interrupted by user")
-        sys.exit(1)
+        exit_code = 1
     except Exception as e:
         logger.error(f"Fatal error: {e}")
         if args.verbose:
             import traceback
             traceback.print_exc()
-        sys.exit(1)
+        exit_code = 1
+    finally:
+        # Clean up temporary context file if created
+        if hasattr(args, '_temp_context_file'):
+            try:
+                import os
+                os.unlink(args._temp_context_file)
+                logger.debug(f"Cleaned up temporary context file: {args._temp_context_file}")
+            except Exception as e:
+                logger.warning(f"Failed to clean up temporary file: {e}")
+        
+        sys.exit(exit_code)
 
 
 if __name__ == "__main__":

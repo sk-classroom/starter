@@ -28,6 +28,12 @@ uv run python -m llm_quiz \
   --quiz-model gpt-4o-mini \
   --evaluator-model gpt-4o \
   --context-urls context_urls.txt
+
+# Or use a configuration file (recommended)
+uv run python -m llm_quiz \
+  --quiz-file quiz.toml \
+  --api-key sk-or-v1-your-openrouter-key \
+  --config config.toml
 ```
 
 ### Required Parameters
@@ -40,14 +46,22 @@ uv run python -m llm_quiz \
 
 ### Optional Parameters
 
+- `--config`: Path to TOML configuration file (recommended)
 - `--context-window-size`: Context window size for LLM models (default: 32768)
+- `--max-tokens`: Maximum tokens in LLM responses (default: 500)
 - `--output`: Save detailed results to JSON file
 - `--verbose`: Enable detailed logging
 
 ### Example Commands
 
 ```bash
-# Basic usage
+# Using configuration file (recommended)
+uv run python -m llm_quiz \
+  --quiz-file my_quiz.toml \
+  --api-key sk-or-v1-abc123 \
+  --config config.toml
+
+# Basic usage without config file
 uv run python -m llm_quiz \
   --quiz-file my_quiz.toml \
   --api-key sk-or-v1-abc123 \
@@ -55,37 +69,59 @@ uv run python -m llm_quiz \
   --evaluator-model gpt-4o \
   --context-urls lecture_urls.txt
 
+# Override config file values with command line options
+uv run python -m llm_quiz \
+  --quiz-file my_quiz.toml \
+  --api-key sk-or-v1-abc123 \
+  --config config.toml \
+  --max-tokens 1000 \
+  --verbose
+
 # Save detailed results
 uv run python -m llm_quiz \
   --quiz-file my_quiz.toml \
   --api-key sk-or-v1-abc123 \
-  --quiz-model gpt-4o-mini \
-  --evaluator-model gpt-4o \
-  --context-urls lecture_urls.txt \
+  --config config.toml \
   --output results.json
-
-# With verbose logging
-uv run python -m llm_quiz \
-  --quiz-file my_quiz.toml \
-  --api-key sk-or-v1-abc123 \
-  --quiz-model gpt-4o-mini \
-  --evaluator-model gpt-4o \
-  --context-urls lecture_urls.txt \
-  --verbose
-
-# With custom context window size
-uv run python -m llm_quiz \
-  --quiz-file my_quiz.toml \
-  --api-key sk-or-v1-abc123 \
-  --quiz-model gpt-4o-mini \
-  --evaluator-model gpt-4o \
-  --context-urls lecture_urls.txt \
-  --context-window-size 128000
 ```
 
 ## 📁 File Setup
 
-### 1. Quiz File (TOML format)
+### 1. Configuration File (TOML format - Recommended)
+Create a `config.toml` file to organize your parameters and context URLs:
+
+```toml
+[api]
+base_url = "https://openrouter.ai/api/v1"
+
+[models]
+quiz_model = "gpt-4o-mini"
+evaluator_model = "gpt-4o"          # Must support structured outputs
+
+[parameters]
+context_window_size = 32768
+max_tokens = 750                    # Increased from default 500
+
+[context]
+urls = [
+    "https://raw.githubusercontent.com/user/repo/main/lecture-01.md",
+    "https://raw.githubusercontent.com/user/repo/main/lecture-02.md",
+    "https://docs.example.com/course-materials.html"
+]
+
+[output]
+results_file = "quiz_results.json"
+verbose = false
+```
+
+**Benefits of using config files:**
+- ✅ Organize all parameters in one place
+- ✅ Reusable configurations for different courses/modules
+- ✅ No need to remember long command lines
+- ✅ Easy to share configurations with others
+- ✅ Command line arguments still override config values
+
+### 2. Quiz File (TOML format)
 Create a `quiz.toml` file with your questions:
 
 ```toml
@@ -100,8 +136,8 @@ question = "Another challenging question?"
 answer = "Another complete answer."
 ```
 
-### 2. Context URLs File
-Create a `context_urls.txt` file with course material URLs:
+### 3. Context URLs File (Alternative to config file)
+If not using a config file, create a `context_urls.txt` file with course material URLs:
 
 ```txt
 # Course materials for context (one URL per line)
@@ -110,7 +146,7 @@ https://raw.githubusercontent.com/user/repo/main/lecture-02.md
 https://docs.example.com/course-materials.html
 ```
 
-### 3. API Key
+### 4. API Key
 Get your API key from [OpenRouter](https://openrouter.ai/) or your preferred LLM provider.
 
 ## 🎯 Creating Effective Questions
@@ -135,6 +171,25 @@ Questions are automatically validated for:
 - ❌ **Prompt injection** (no AI manipulation attempts)
 - ✅ **Answer quality** (accurate and complete)
 - ✅ **Context relevance** (when context materials are provided)
+
+## 🔧 Advanced Features
+
+### Structured Outputs
+The system uses OpenAI-compatible structured outputs for reliable evaluation and validation:
+- **JSON Schema validation** ensures consistent responses
+- **Type-safe parsing** eliminates parsing errors
+- **Compatible models**: OpenAI GPT-4o+, Fireworks models, and other structured output providers
+
+### Configurable Parameters
+- **Max tokens**: Control response length (default: 500, configurable via `--max-tokens` or config file)
+- **Context window size**: Adjust for different models (default: 32768)
+- **Multiple model support**: Use different models for quiz-taking and evaluation
+
+### Configuration Management
+- **TOML configuration files** for organized parameter management
+- **Command line override** of config file values
+- **Environment-specific configs** (development, production, different courses)
+- **Example configurations** included in `config_examples/` directory
 
 ## 🎓 GitHub Classroom Integration
 

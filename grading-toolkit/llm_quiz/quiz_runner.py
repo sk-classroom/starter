@@ -7,7 +7,7 @@ between validation, question answering, and evaluation components.
 
 import logging
 from typing import Dict, Any, List, Optional, Union
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from pathlib import Path
 import json
 
@@ -21,6 +21,22 @@ from .content_loader import ContentLoader
 from .validator import QuestionValidator, ValidationResult
 
 logger = logging.getLogger(__name__)
+
+
+class DataclassJSONEncoder(json.JSONEncoder):
+    """JSON encoder that can handle dataclasses and enums."""
+    
+    def default(self, obj):
+        if hasattr(obj, '__dataclass_fields__'):
+            # Convert dataclass to dictionary
+            return asdict(obj)
+        elif hasattr(obj, 'value'):
+            # Handle enums
+            return obj.value
+        elif hasattr(obj, 'name'):
+            # Handle enums without value
+            return obj.name
+        return super().default(obj)
 
 
 @dataclass
@@ -73,20 +89,57 @@ class QuizResults:
 class QuizRunner:
     """Orchestrates the complete quiz challenge process."""
     
-    def __init__(self, llm_client: LLMClient, quiz_model: str, evaluator_model: str):
+    def __init__(self, llm_client: LLMClient, quiz_model: str, evaluator_model: str, max_tokens: int = 500):
         """Initialize the quiz runner.
         
         Args:
             llm_client: LLM client for API interactions
             quiz_model: Model for answering quiz questions
             evaluator_model: Model for evaluating answers
+            max_tokens: Maximum tokens in LLM response (default: 500)
         """
         self.llm_client = llm_client
         self.quiz_model = quiz_model
         self.evaluator_model = evaluator_model
+        self.max_tokens = max_tokens
         self.content_loader = ContentLoader()
-        self.validator = QuestionValidator(llm_client, evaluator_model)
+        self.validator = QuestionValidator(llm_client, evaluator_model, max_tokens)
         self.context_content: Optional[str] = None
+    
+    def _get_evaluation_schema(self) -> Dict[str, Any]:
+        """Get JSON schema for structured evaluation responses."""
+        return {
+            "type": "json_schema",
+            "json_schema": {
+                "name": "evaluation_result",
+                "strict": True,
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "verdict": {
+                            "type": "string",
+                            "enum": ["CORRECT", "INCORRECT"],
+                            "description": "Whether the LLM's answer is correct or incorrect"
+                        },
+                        "student_wins": {
+                            "type": "boolean",
+                            "description": "True if the student wins (LLM got it wrong), False if LLM got it right"
+                        },
+                        "explanation": {
+                            "type": "string",
+                            "description": "Brief explanation of the evaluation decision and reasoning"
+                        },
+                        "confidence": {
+                            "type": "string",
+                            "enum": ["HIGH", "MEDIUM", "LOW"],
+                            "description": "Confidence level in the evaluation"
+                        }
+                    },
+                    "required": ["verdict", "student_wins", "explanation", "confidence"],
+                    "additionalProperties": False
+                }
+            }
+        }
     
     def load_context_from_urls_file(self, urls_file: str) -> bool:
         """Load context content from a URLs file.
@@ -255,34 +308,45 @@ class QuizRunner:
                 question_results.append(result)
                 continue
             
-            # Parse evaluation result
-            is_correct = "CORRECT" in evaluation.content.upper()
-            student_wins = not is_correct  # Student wins if LLM got it wrong
-            
-            if student_wins:
-                student_wins += 1
-            else:
-                llm_wins += 1
-            
-            # Extract evaluation details
-            eval_lines = evaluation.content.split('\n')
-            explanation = ""
-            confidence = "MEDIUM"
-            
-            for line in eval_lines:
-                if line.startswith('EXPLANATION:'):
-                    explanation = line.replace('EXPLANATION:', '').strip()
-                elif line.startswith('CONFIDENCE:'):
-                    confidence = line.replace('CONFIDENCE:', '').strip()
-            
-            if not explanation:
-                explanation = evaluation.content
+            # Parse structured JSON response
+            try:
+                eval_data = json.loads(evaluation.content)
+                
+                verdict = eval_data.get("verdict", "INCORRECT")
+                question_student_wins = eval_data.get("student_wins", False)
+                explanation = eval_data.get("explanation", "No explanation provided")
+                confidence = eval_data.get("confidence", "MEDIUM")
+                
+                is_correct = verdict == "CORRECT"
+                
+                if question_student_wins:
+                    student_wins += 1
+                else:
+                    llm_wins += 1
+                    
+            except json.JSONDecodeError as e:
+                logger.error(f"Failed to parse structured evaluation response: {e}")
+                logger.error(f"Raw response: {evaluation.content}")
+                
+                # Fallback to treating as system error
+                system_errors += 1
+                result = QuestionResult(
+                    question=question,
+                    llm_answer=llm_response.content,
+                    is_correct=False,
+                    student_wins=False,
+                    evaluation_explanation=f"Evaluation parsing error: {evaluation.content}",
+                    evaluation_confidence="LOW",
+                    error=f"JSON parsing failed: {e}"
+                )
+                question_results.append(result)
+                continue
             
             result = QuestionResult(
                 question=question,
                 llm_answer=llm_response.content,
                 is_correct=is_correct,
-                student_wins=student_wins,
+                student_wins=question_student_wins,
                 evaluation_explanation=explanation,
                 evaluation_confidence=confidence,
                 raw_evaluation=evaluation.content
@@ -337,14 +401,15 @@ Instructions:
             model=self.quiz_model,
             system_message=system_message,
             temperature=0.1,
-            max_tokens=500
+            max_tokens=self.max_tokens
         )
     
     def _evaluate_answer(self, question: str, correct_answer: str, llm_answer: str) -> Any:
-        """Evaluate LLM answer against the correct answer."""
+        """Evaluate LLM answer against the correct answer using structured output."""
         system_message = ("You are an expert evaluator for academic questions. "
                          "Your job is to determine if a student's answer is correct or incorrect. "
-                         "Be strict but fair in your evaluation.")
+                         "Be strict but fair in your evaluation. "
+                         "Respond with structured JSON containing your evaluation.")
         
         prompt = f"""Evaluate whether the following answer is correct or incorrect.
 
@@ -359,18 +424,19 @@ LLM's ANSWER:
 
 Consider the answer correct if it demonstrates understanding of the core concepts, even if the wording is different from the student's answer. Consider it incorrect if there are errors, missing key points, or fundamental misunderstandings.
 
-Respond with:
-EXPLANATION: [Brief explanation of your decision and reasoning]
-VERDICT: [CORRECT/INCORRECT] 
-CONFIDENCE: [HIGH/MEDIUM/LOW]
-STUDENT_WINS: [TRUE/FALSE] (TRUE if LLM got it wrong, FALSE if LLM got it right)"""
+Your response must include:
+- verdict: "CORRECT" or "INCORRECT" 
+- student_wins: true if LLM got it wrong (student wins), false if LLM got it right
+- explanation: Brief explanation of your decision and reasoning
+- confidence: "HIGH", "MEDIUM", or "LOW" confidence in your evaluation"""
         
         return self.llm_client.simple_chat(
             prompt=prompt,
             model=self.evaluator_model,
             system_message=system_message,
             temperature=0.1,
-            max_tokens=400
+            max_tokens=self.max_tokens,
+            response_format=self._get_evaluation_schema()
         )
     
     def save_results(self, results: QuizResults, output_file: Path) -> None:
@@ -418,7 +484,7 @@ STUDENT_WINS: [TRUE/FALSE] (TRUE if LLM got it wrong, FALSE if LLM got it right)
             }
             
             with open(output_file, 'w') as f:
-                json.dump(results_dict, f, indent=2)
+                json.dump(results_dict, f, indent=2, cls=DataclassJSONEncoder)
             
             logger.info(f"Results saved to {output_file}")
             

@@ -25,7 +25,7 @@ class LLMQuizChallenge:
     
     def __init__(self, api_key: str, base_url: str = "https://openrouter.ai/api/v1",
                  quiz_model: str = "gpt-4o-mini", evaluator_model: str = "gpt-4o",
-                 context_window_size: int = 32768):
+                 context_window_size: int = 32768, max_tokens: int = 500):
         """Initialize the quiz challenge system.
         
         Args:
@@ -34,13 +34,15 @@ class LLMQuizChallenge:
             quiz_model: Model for answering questions (default: gpt-4o-mini)
             evaluator_model: Model for evaluating answers (default: gpt-4o)
             context_window_size: Context window size for models (default: 32768)
+            max_tokens: Maximum tokens in LLM response (default: 500)
         """
         self.llm_client = LLMClient(base_url=base_url, api_key=api_key, 
                                    context_window_size=context_window_size)
         self.quiz_runner = QuizRunner(
             llm_client=self.llm_client,
             quiz_model=quiz_model,
-            evaluator_model=evaluator_model
+            evaluator_model=evaluator_model,
+            max_tokens=max_tokens
         )
         self.results_analyzer = ResultsAnalyzer()
         self.last_results: Optional[QuizResults] = None
