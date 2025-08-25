@@ -3,6 +3,9 @@ import marimo
 __generated_with = "0.14.13"
 app = marimo.App()
 
+with app.setup(hide_code=True):
+    # Initialization code that runs before all other cells
+    import numpy as np
 
 @app.cell(hide_code=True)
 def _(mo):
@@ -25,7 +28,6 @@ def _(mo):
 @app.cell
 def _():
     # All imports in one place to avoid conflicts
-    import numpy as np
     import matplotlib.pyplot as plt
 
     return np, plt
