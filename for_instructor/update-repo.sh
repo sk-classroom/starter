@@ -9,6 +9,9 @@ if [[ $# -lt 5 ]]; then
   echo "Usage: bash update-repo.sh CLASSROOM_ORG REPO_A REPO_B BRANCH \"FILE_PATTERNS\""
   echo "Example: bash update-repo.sh sk-classroom sk-classroom/starter sk-classroom/advnetsci-starter-starter main \"*.md requirements.txt src/\""
   echo "FILE_PATTERNS: Space-separated list of files/directories/patterns to sync"
+  echo "              Supports relative paths: ../parent_file.txt ./current_dir/ subdir/file.txt"
+  echo "              Supports absolute paths: /absolute/path/file.txt"
+  echo "              Supports wildcards: *.py src/*.txt"
   exit 1
 fi
 
@@ -32,16 +35,36 @@ sync_files() {
 
     # Copy each specified file/pattern
     for pattern in $patterns; do
-        # Resolve the actual source path (handle ../ paths)
+        # Resolve the actual source path (handle relative paths)
         local source_path
-        if [[ "$pattern" == ../* ]]; then
-            source_path="$current_dir/$pattern"
+        local target_pattern="$pattern"
+        
+        if [[ "$pattern" == /* ]]; then
+            # Absolute path - use as is
+            source_path="$pattern"
+        elif [[ "$pattern" == ../* ]]; then
+            # Relative path going up from source_dir
+            source_path="$source_dir/$pattern"
+            # Clean up the target pattern (remove ../ prefix)
+            target_pattern="${pattern#../}"
+        elif [[ "$pattern" == ./* ]]; then
+            # Relative path from source_dir
+            source_path="$source_dir/$pattern"
+            # Clean up the target pattern (remove ./ prefix)  
+            target_pattern="${pattern#./}"
         else
+            # Regular path relative to source_dir
             source_path="$source_dir/$pattern"
         fi
-
-        # Clean up the target pattern (remove ../ prefix)
-        local target_pattern="${pattern#../}"
+        
+        # Try to resolve the path properly
+        if [[ "$pattern" != /* ]]; then
+            # For relative paths, try to resolve them from source_dir
+            resolved_path=$(cd "$source_dir" 2>/dev/null && realpath "$pattern" 2>/dev/null) || resolved_path=""
+            if [[ -n "$resolved_path" && -e "$resolved_path" ]]; then
+                source_path="$resolved_path"
+            fi
+        fi
 
         if [[ -e "$source_path" || -d "$source_path" ]]; then
             echo "  Syncing: $pattern -> $target_pattern"
