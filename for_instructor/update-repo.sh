@@ -137,25 +137,27 @@ for repo in $STUDENT_REPOS; do
     # Sync specific files
     sync_files "$TEMP_DIR/template-repo" "$TEMP_DIR/student-repo" "$FILE_PATTERNS"
 
-    # Navigate to student repo directory
-    if ! cd "$TEMP_DIR/student-repo"; then
-        echo "Error: Cannot access student-repo directory for $repo - skipping"
-        continue
-    fi
+    # Navigate to student repo directory and perform git operations
+    (
+        cd "$TEMP_DIR/student-repo" || {
+            echo "Error: Cannot access student-repo directory for $repo - skipping"
+            exit 1
+        }
 
-    git add -A
+        git add -A
 
-    if git diff --staged --quiet; then
-        echo "No changes needed for $repo"
-    else
-        # Check if there are any conflicts by trying to commit
-        if git commit -m "Sync template files: $FILE_PATTERNS"; then
-            git push origin "$BRANCH"
-            echo "Successfully synced files to $repo"
+        if git diff --staged --quiet; then
+            echo "No changes needed for $repo"
         else
-            echo "Failed to commit changes to $repo - may need manual intervention"
+            # Check if there are any conflicts by trying to commit
+            if git commit -m "Sync template files: $FILE_PATTERNS"; then
+                git push origin "$BRANCH"
+                echo "Successfully synced files to $repo"
+            else
+                echo "Failed to commit changes to $repo - may need manual intervention"
+            fi
         fi
-    fi
+    ) || echo "Skipping $repo due to directory access issues"
 
     # Clean up - go back to temp dir and remove student repo
     cd "$TEMP_DIR"
