@@ -4,11 +4,11 @@
 set -e
 
 # Configuration (must be provided as command-line arguments)
-# Usage: bash update-repo.sh CLASSROOM_ORG REPO_A REPO_B BRANCH "FILE_PATTERN1 FILE_PATTERN2 ..."
+# Usage: bash update-repo.sh CLASSROOM_ORG REPO_A REPO_B BRANCH FILE_PATTERN1 [FILE_PATTERN2 ...]
 if [[ $# -lt 5 ]]; then
-  echo "Usage: bash update-repo.sh CLASSROOM_ORG REPO_A REPO_B BRANCH \"FILE_PATTERNS\""
-  echo "Example: bash update-repo.sh sk-classroom sk-classroom/starter sk-classroom/advnetsci-starter-starter main \"*.md requirements.txt src/\""
-  echo "FILE_PATTERNS: Space-separated list of files/directories/patterns to sync"
+  echo "Usage: bash update-repo.sh CLASSROOM_ORG REPO_A REPO_B BRANCH FILE_PATTERN1 [FILE_PATTERN2 ...]"
+  echo "Example: bash update-repo.sh sk-classroom sk-classroom/starter sk-classroom/advnetsci-starter-starter main *.md requirements.txt src/"
+  echo "FILE_PATTERNS: List of files/directories/patterns to sync (without quotes)"
   echo "              Supports relative paths: ../parent_file.txt ./current_dir/ subdir/file.txt"
   echo "              Supports absolute paths: /absolute/path/file.txt"
   echo "              Supports wildcards: *.py src/*.txt"
@@ -19,7 +19,8 @@ CLASSROOM_ORG="$1" # GitHub Classroom organization
 REPO_A="$2"        # Source repo
 REPO_B="$3"        # Template repo
 BRANCH="$4"        # Branch to propagate
-FILE_PATTERNS="$5" # Files/patterns to sync
+shift 4            # Remove first 4 arguments
+FILE_PATTERNS="$*" # All remaining arguments as file patterns
 
 echo "Syncing specific files: $REPO_A -> $REPO_B -> all student forks"
 echo "Files to sync: $FILE_PATTERNS"
