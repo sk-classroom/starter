@@ -29,6 +29,7 @@ sync_files() {
     local source_dir="$1"
     local target_dir="$2"
     local patterns="$3"
+    local original_dir="$4"  # Directory where script was originally run
     local current_dir=$(pwd)
 
     cd "$target_dir"
@@ -48,8 +49,8 @@ sync_files() {
             # Clean up the target pattern (remove ../ prefix)
             target_pattern="${pattern#../}"
         elif [[ "$pattern" == ./* ]]; then
-            # Relative path from source_dir
-            source_path="$source_dir/$pattern"
+            # Relative path from original directory where script was run
+            source_path="$original_dir/$pattern"
             # Clean up the target pattern (remove ./ prefix)  
             target_pattern="${pattern#./}"
         else
@@ -57,12 +58,17 @@ sync_files() {
             source_path="$source_dir/$pattern"
         fi
         
-        # Try to resolve the path properly
-        if [[ "$pattern" != /* ]]; then
-            # For relative paths, try to resolve them from source_dir
-            resolved_path=$(cd "$source_dir" 2>/dev/null && realpath "$pattern" 2>/dev/null) || resolved_path=""
-            if [[ -n "$resolved_path" && -e "$resolved_path" ]]; then
-                source_path="$resolved_path"
+        # Try to resolve the path properly, but preserve the original logic for simple cases
+        if [[ "$pattern" != /* && "$pattern" != ../* ]]; then
+            # For simple relative paths, try to resolve them from source_dir
+            if [[ -e "$source_dir/$pattern" || -d "$source_dir/$pattern" ]]; then
+                source_path="$source_dir/$pattern"
+            else
+                # Try resolving from the original working directory
+                original_resolved=$(cd "$original_dir" 2>/dev/null && realpath "$pattern" 2>/dev/null) || original_resolved=""
+                if [[ -n "$original_resolved" && -e "$original_resolved" ]]; then
+                    source_path="$original_resolved"
+                fi
             fi
         fi
 
@@ -87,6 +93,7 @@ sync_files() {
 
 # First sync A into B
 echo "Syncing files from $REPO_A into template $REPO_B..."
+ORIGINAL_DIR=$(pwd)  # Store original directory
 TEMP_DIR=$(mktemp -d)
 cd "$TEMP_DIR"
 
@@ -103,7 +110,7 @@ if [[ -d "source-repo/grading" ]]; then
 fi
 
 # Sync specific files
-sync_files "$TEMP_DIR/source-repo" "$TEMP_DIR/template-repo" "$FILE_PATTERNS"
+sync_files "$TEMP_DIR/source-repo" "$TEMP_DIR/template-repo" "$FILE_PATTERNS" "$ORIGINAL_DIR"
 
 # Commit and push changes to template
 cd "$TEMP_DIR/template-repo"
@@ -158,7 +165,7 @@ for repo in $STUDENT_REPOS; do
     fi
 
     # Sync specific files
-    sync_files "$TEMP_DIR/template-repo" "$TEMP_DIR/student-repo" "$FILE_PATTERNS"
+    sync_files "$TEMP_DIR/template-repo" "$TEMP_DIR/student-repo" "$FILE_PATTERNS" "$ORIGINAL_DIR"
 
     # Navigate to student repo directory and perform git operations
     (
