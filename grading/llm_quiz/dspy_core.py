@@ -517,13 +517,26 @@ class DSPyQuizChallenge:
                 pbar.update(1)  # Step 2 complete
 
                 is_valid = getattr(validation, 'is_valid', False)
-                if not is_valid:
+                issues = getattr(validation, 'issues', [])
+                
+                # Override validation result: don't fail questions just for context mismatch
+                # Only fail for heavy_math, prompt_injection, answer_quality, or other blocking issues
+                blocking_issues = [issue for issue in issues if issue != ValidationIssue.CONTEXT_MISMATCH]
+                if blocking_issues and not is_valid:
+                    # Keep original validity decision for blocking issues
+                    final_validity = is_valid
+                else:
+                    # If only context_mismatch (or no blocking issues), consider it valid
+                    final_validity = True
+                    if ValidationIssue.CONTEXT_MISMATCH in issues:
+                        logger.info(f"Question {question.number} has context mismatch but proceeding anyway")
+                
+                if not final_validity:
                     pbar.set_description(f"Q{question.number}: Question invalid, skipping")
                     reason = getattr(validation, 'reason', 'Unknown validation error')
                     logger.warning(
                         f"Student's question {question.number} failed validation: {reason}"
                     )
-                    issues = getattr(validation, 'issues', [])
                     all_validation_issues.extend([issue.value if hasattr(issue, 'value') else str(issue) for issue in issues])
 
                     result = QuizResult(
